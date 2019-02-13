@@ -5,8 +5,9 @@ macro(project_add_executable)
 
     set("__INC_DIR" "${CMAKE_CURRENT_SOURCE_DIR}/inc")
     set("__SRC_DIR" "${CMAKE_CURRENT_SOURCE_DIR}/src")
-    file(GLOB "__INC" "${__INC_DIR}/*.h" "${__INC_DIR}/*.hpp")
-    file(GLOB "__SRC" "${__SRC_DIR}/*.c" "${__SRC_DIR}/*.cpp")
+
+    file(GLOB_RECURSE "__INC" "${__INC_DIR}/*.h" "${__INC_DIR}/*.hpp")
+    file(GLOB_RECURSE "__SRC" "${__SRC_DIR}/*.c" "${__SRC_DIR}/*.cpp")
 
     # internal only
     #    set("${ARGV0}_INC_DIR"
@@ -43,9 +44,9 @@ macro(project_add_library)
     set("__INCLUDE_DIR" "${CMAKE_CURRENT_SOURCE_DIR}/include")
     set("__SRC_DIR" "${CMAKE_CURRENT_SOURCE_DIR}/src")
 
-    file(GLOB "__INC" "${__INC_DIR}/*.h" "${__INC_DIR}/*.hpp")
-    file(GLOB "__INCLUDE" "${__INCLUDE_DIR}/*.h" "${__INCLUDE_DIR}/*.hpp")
-    file(GLOB "__SRC" "${__SRC_DIR}/*.c" "${__SRC_DIR}/*.cpp")
+    file(GLOB_RECURSE "__INC" "${__INC_DIR}/*.h" "${__INC_DIR}/*.hpp")
+    file(GLOB_RECURSE "__INCLUDE" "${__INCLUDE_DIR}/*.h" "${__INCLUDE_DIR}/*.hpp")
+    file(GLOB_RECURSE "__SRC" "${__SRC_DIR}/*.c" "${__SRC_DIR}/*.cpp")
 
     # internal only
     #    set("${ARGV0}_INC_DIR"
