@@ -1,7 +1,8 @@
 #pragma once
 
-#include <qmck/engine.hpp>
-#include <qmck/stt_table.hpp>
-#include <qmck/table.hpp>
-#include <qmck/table_format.hpp>
-#include <qmck/table_row.hpp>
+#include <qmck/core.hpp>
+#include <qmck/extended_logic_bundle.hpp>
+#include <qmck/extended_logic_table.hpp>
+#include <qmck/logic_array.hpp>
+#include <qmck/logic_table.hpp>
+#include <qmck/logic_table_format.hpp>

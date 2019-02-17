@@ -42,10 +42,7 @@
       <option name="KEEP_CONTROL_STATEMENT_IN_ONE_LINE" value="false" />
       <option name="KEEP_BLANK_LINES_IN_DECLARATIONS" value="1" />
       <option name="KEEP_BLANK_LINES_IN_CODE" value="1" />
-      <option name="KEEP_BLANK_LINES_BEFORE_RBRACE" value="1" />
-      <option name="BLANK_LINES_AROUND_FIELD" value="1" />
-      <option name="BLANK_LINES_BEFORE_METHOD_BODY" value="1" />
-      <option name="BLANK_LINES_AROUND_FIELD_IN_INTERFACE" value="1" />
+      <option name="KEEP_BLANK_LINES_BEFORE_RBRACE" value="0" />
       <option name="BLANK_LINES_AFTER_CLASS_HEADER" value="1" />
       <option name="BRACE_STYLE" value="2" />
       <option name="CLASS_BRACE_STYLE" value="2" />
@@ -53,13 +50,11 @@
       <option name="WHILE_ON_NEW_LINE" value="true" />
       <option name="CATCH_ON_NEW_LINE" value="true" />
       <option name="INDENT_CASE_FROM_SWITCH" value="false" />
-      <option name="ALIGN_MULTILINE_CHAINED_METHODS" value="true" />
       <option name="ALIGN_MULTILINE_FOR" value="false" />
       <option name="ALIGN_MULTILINE_BINARY_OPERATION" value="false" />
       <option name="ALIGN_MULTILINE_ASSIGNMENT" value="false" />
       <option name="ALIGN_MULTILINE_TERNARY_OPERATION" value="false" />
       <option name="ALIGN_MULTILINE_ARRAY_INITIALIZER_EXPRESSION" value="false" />
-      <option name="METHOD_CALL_CHAIN_WRAP" value="2" />
       <option name="BINARY_OPERATION_WRAP" value="0" />
       <option name="TERNARY_OPERATION_WRAP" value="0" />
       <option name="TERNARY_OPERATION_SIGNS_ON_NEXT_LINE" value="false" />

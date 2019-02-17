@@ -1,19 +1,28 @@
 #include <qmck.hpp>
 
-int main()
+#include <fstream>
+#include <iostream>
+
+using namespace qmck;
+
+int main(int const argc, char const **argv)
 {
+    if (argc < 2)
+    {
+        return -1;
+    }
 
-    qmck::qmck(qmck::table{});
+    std::ifstream table_file_stream(argv[1]);
+    std::string table_str{std::istreambuf_iterator<char>(table_file_stream), std::istreambuf_iterator<char>()};
 
-    //     sttTable stable = sttTable.loadTable(new TableFormat(12, 23), new File("testfile.txt"));
-    //
-    //  System.out.println("table loaded:");
-    // System.out.println(stable);
+    char const *begin = table_str.c_str();
+    char const *end = table_str.c_str() + table_str.size();
 
-    //        System.out.println(stable.toqmckTable());
+    auto table = qmck::parse_logic_table(begin, end);
+    //std::cout << table.to_string();
 
-    //    qmckTable qmcktable = stable.toqmckTable();
-    //    qmckEngine.qmck(qmcktable);
+    auto deduced = qmck::deduce(table);
+    //std::cout << deduced.to_string();
 
     return 0;
 }

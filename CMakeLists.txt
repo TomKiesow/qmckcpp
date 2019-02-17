@@ -9,26 +9,6 @@ macro(project_add_executable)
     file(GLOB_RECURSE "__INC" "${__INC_DIR}/*.h" "${__INC_DIR}/*.hpp")
     file(GLOB_RECURSE "__SRC" "${__SRC_DIR}/*.c" "${__SRC_DIR}/*.cpp")
 
-    # internal only
-    #    set("${ARGV0}_INC_DIR"
-    #            "${__INC_DIR}"
-    #            CACHE PATH "" FORCE)
-
-    # internal only
-    #    set("${ARGV0}_SRC_DIR"
-    #            "${__SRC_DIR}"
-    #            CACHE PATH "" FORCE)
-
-    # internal only
-    #    set("${ARGV0}_INC"
-    #            "${__INC}"
-    #            CACHE String "" FORCE)
-
-    # internal only
-    #    set("${ARGV0}_SRC"
-    #            "${__SRC}"
-    #            CACHE String "" FORCE)
-
     add_executable("${ARGV0}"
             "${__INC}"
             "${__SRC}")
@@ -47,34 +27,6 @@ macro(project_add_library)
     file(GLOB_RECURSE "__INC" "${__INC_DIR}/*.h" "${__INC_DIR}/*.hpp")
     file(GLOB_RECURSE "__INCLUDE" "${__INCLUDE_DIR}/*.h" "${__INCLUDE_DIR}/*.hpp")
     file(GLOB_RECURSE "__SRC" "${__SRC_DIR}/*.c" "${__SRC_DIR}/*.cpp")
-
-    # internal only
-    #    set("${ARGV0}_INC_DIR"
-    #            "${__INC_DIR}"
-    #            CACHE PATH "" FORCE)
-
-    set("${ARGV0}_INCLUDE_DIR"
-            "${__INCLUDE_DIR}"
-            CACHE PATH "" FORCE)
-
-    # internal only
-    #    set("${ARGV0}_SRC_DIR"
-    #            "${__SRC_DIR}"
-    #            CACHE PATH "" FORCE)
-
-    # internal only
-    #    set("${ARGV0}_INC"
-    #            "${__INC}"
-    #            CACHE String "" FORCE)
-
-    set("${ARGV0}_INCLUDE"
-            "${__INCLUDE}"
-            CACHE String "" FORCE)
-
-    # internal only
-    #    set("${ARGV0}_SRC"
-    #            "${__SRC}"
-    #            CACHE String "" FORCE)
 
     add_library("${ARGV0}" SHARED
             "${__INC}"
