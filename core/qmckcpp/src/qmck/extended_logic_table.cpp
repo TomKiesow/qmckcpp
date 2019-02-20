@@ -40,6 +40,19 @@ qmck::extended_logic_table::extended_logic_table(qmck::logic_table &&lhs)
     }
 }
 
+qmck::extended_logic_table &qmck::extended_logic_table::operator=(qmck::extended_logic_table lhs)
+{
+    swap(*this, lhs);
+    return *this;
+}
+
+void qmck::swap(qmck::extended_logic_table &first, qmck::extended_logic_table &second)
+{
+    using std::swap;
+    swap(first.format, second.format);
+    swap(first.logic_bundle_ranks, second.logic_bundle_ranks);
+}
+
 std::string qmck::extended_logic_table::to_string()
 {
     std::string result{};
@@ -70,16 +83,4 @@ std::string qmck::extended_logic_table::to_string()
     }
 
     return result;
-}
-
-qmck::extended_logic_table &qmck::extended_logic_table::operator=(qmck::extended_logic_table lhs)
-{
-    swap(lhs);
-    return *this;
-}
-
-void qmck::extended_logic_table::swap(qmck::extended_logic_table &lhs)
-{
-    std::swap(format, lhs.format);
-    std::swap(logic_bundle_ranks, lhs.logic_bundle_ranks);
 }

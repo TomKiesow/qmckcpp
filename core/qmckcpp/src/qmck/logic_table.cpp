@@ -177,41 +177,19 @@ qmck::logic_table::logic_table(qmck::logic_table_format format, qmck::logic_arra
 {
 }
 
-std::string qmck::logic_table::to_string()
-{
-    std::string result{};
-
-    result += "inputs = ";
-    result += std::to_string(format.inputs_count);
-    result += "\noutputs = ";
-    result += std::to_string(format.outputs_count);
-    result += "\n";
-
-    size_t the_end = inputs.size();
-    for (size_t the_idx{0}; the_idx < the_end; the_idx++)
-    {
-        std::bitset<32> input{inputs[the_idx]};
-        std::bitset<32> output{outputs[the_idx]};
-        std::bitset<32> output_mask{output_dc_masks[the_idx]};
-
-        result += input.to_string() + " | " + output.to_string() + " | " + output_mask.to_string() + '\n';
-    }
-
-    return result;
-}
-
 qmck::logic_table &qmck::logic_table::operator=(qmck::logic_table lhs)
 {
-    swap(lhs);
+    swap(*this, lhs);
     return *this;
 }
 
-void qmck::logic_table::swap(qmck::logic_table &lhs)
+void qmck::swap(qmck::logic_table &first, qmck::logic_table &second)
 {
-    std::swap(format, lhs.format);
-    std::swap(inputs, lhs.inputs);
-    std::swap(outputs, lhs.outputs);
-    std::swap(output_dc_masks, lhs.output_dc_masks);
+    using std::swap;
+    swap(first.format, second.format);
+    swap(first.inputs, second.inputs);
+    swap(first.outputs, second.outputs);
+    swap(first.output_dc_masks, second.output_dc_masks);
 }
 
 qmck::logic_table qmck::parse_logic_table(char const *i, char const *n)

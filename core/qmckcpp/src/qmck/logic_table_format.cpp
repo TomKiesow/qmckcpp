@@ -6,14 +6,15 @@ qmck::logic_table_format::logic_table_format(uint32_t inputs_count, uint32_t out
 {
 }
 
-qmck::logic_table_format &qmck::logic_table_format::operator=(qmck::logic_table_format lhs) noexcept
+qmck::logic_table_format &qmck::logic_table_format::operator=(qmck::logic_table_format lhs)
 {
-    swap(lhs);
+    swap(*this, lhs);
     return *this;
 }
 
-void qmck::logic_table_format::swap(qmck::logic_table_format &lhs)
+void qmck::swap(qmck::logic_table_format &first, qmck::logic_table_format &second)
 {
-    std::swap(inputs_count, lhs.inputs_count);
-    std::swap(outputs_count, lhs.outputs_count);
+    using std::swap;
+    swap(first.inputs_count, second.inputs_count);
+    swap(first.outputs_count, second.outputs_count);
 }

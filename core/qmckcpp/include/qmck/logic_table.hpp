@@ -29,14 +29,13 @@ namespace qmck
 
         logic_table(logic_table const &lhs) = default;
 
-        logic_table(logic_table &&rhs) = default;
+        logic_table(logic_table &&rhs) noexcept = default;
+
+    public:
 
         logic_table &operator=(logic_table lhs);
 
-        void swap(logic_table &lhs);
-
-    public:
-        std::string to_string();
+        friend void swap(logic_table &first, logic_table &second);
     };
 
     logic_table parse_logic_table(char const *table_c_str_begin, char const *table_c_str_end);

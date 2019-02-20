@@ -11,7 +11,7 @@ namespace qmck
     {
     public:
         logic_table_format format{};
-        std::array<logic_bundle, 32> logic_bundle_ranks;
+        std::array<extended_logic_bundle, 32> logic_bundle_ranks;
 
     public:
 
@@ -25,11 +25,10 @@ namespace qmck
 
         extended_logic_table(extended_logic_table &&lhs) noexcept = default;
 
+    public:
+
         extended_logic_table &operator=(extended_logic_table lhs);
 
-        void swap(extended_logic_table &lhs);
-
-    public:
-        std::string to_string();
+        friend void swap(extended_logic_table &first, extended_logic_table &second);
     };
 }

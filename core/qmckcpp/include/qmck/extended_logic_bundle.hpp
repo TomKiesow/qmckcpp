@@ -1,10 +1,11 @@
 #pragma once
 
 #include <qmck/logic_array.hpp>
+#include <string>
 
 namespace qmck
 {
-    struct logic_bundle
+    struct extended_logic_bundle
     {
     public:
         logic_array inputs{};
@@ -15,14 +16,16 @@ namespace qmck
 
     public:
 
-        logic_bundle() = default;
+        extended_logic_bundle() = default;
 
-        logic_bundle(logic_bundle const &lhs) = default;
+        extended_logic_bundle(extended_logic_bundle const &lhs) = default;
 
-        logic_bundle(logic_bundle &&lhs) noexcept = default;
+        extended_logic_bundle(extended_logic_bundle &&lhs) noexcept = default;
 
-        logic_bundle &operator=(logic_bundle lhs);
+    public:
 
-        void swap(logic_bundle &lhs);
+        extended_logic_bundle &operator=(extended_logic_bundle lhs);
+
+        friend void swap(extended_logic_bundle &first, extended_logic_bundle &second);
     };
 }

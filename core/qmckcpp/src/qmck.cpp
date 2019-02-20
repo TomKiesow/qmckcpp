@@ -1,4 +1,4 @@
-#include <qmck/core.hpp>
+#include <qmck.hpp>
 
 #include <iostream>
 
