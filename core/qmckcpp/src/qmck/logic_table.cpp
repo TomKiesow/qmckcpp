@@ -217,3 +217,34 @@ qmck::logic_table qmck::parse_logic_table(char const *i, char const *n)
 
     return table;
 }
+
+// simple selection-sort
+void qmck::logic_table::sort()
+{
+    int i_border = 0;
+
+    do
+    {
+        int i_min = i_border;
+        for (int i = i_border; i < inputs.size(); i++)
+        {
+            if (inputs[i] < inputs[i_min])
+            {
+                i_min = i;
+            }
+        }
+
+        uint32_t tmp = inputs[i_border];    // bekommt man den typ auch irgendwie aus dem logic_array heraus?
+        inputs[i_border] = inputs[i_min];
+        inputs[i_min] = tmp;
+
+        tmp = outputs[i_border];
+        outputs[i_border] = outputs[i_min];
+        outputs[i_min] = tmp;
+
+        tmp = output_dc_masks[i_border];
+        output_dc_masks[i_border] = output_dc_masks[i_min];
+        output_dc_masks[i_min] = tmp;
+    }
+    while (i_border++ < inputs.size());
+}

@@ -19,9 +19,10 @@ int main(int const argc, char const **argv)
     char const *end = table_str.c_str() + table_str.size();
 
     auto table = qmck::parse_logic_table(begin, end);
-    //std::cout << table.to_string();
+    table.sort();
+    std::cout << table;
 
-    auto deduced = qmck::deduce(table);
+    //    auto deduced = qmck::deduce(table);
     //std::cout << deduced.to_string();
 
     return 0;

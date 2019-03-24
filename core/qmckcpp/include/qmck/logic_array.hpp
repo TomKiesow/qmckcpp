@@ -5,5 +5,5 @@
 
 namespace qmck
 {
-    typedef std::vector<uint32_t> logic_array;
+    typedef std::vector<std::uint32_t> logic_array;
 }

@@ -6,7 +6,7 @@ namespace qmck
 {
     qmck::extended_logic_table deduce(qmck::logic_table table)
     {
-        std::cout << table.to_string();
+        std::cout << table;
         // custom : logic_table
         //
         // inputs | outputs
@@ -35,7 +35,7 @@ namespace qmck
         //    +-> tread dont cares in the output as zeros
 
         qmck::extended_logic_table extended_table{table};
-        std::cout << extended_table.to_string();
+        std::cout << extended_table;
 
         // =>
         // custom : 1. reduction_logic_table
@@ -117,7 +117,7 @@ namespace qmck
                 }
             }
             //extended_table = qmck::extended_logic_table{extended_table_next};
-            std::cout << extended_table_next.to_string();
+            std::cout << extended_table_next;
         }
 
         // =>

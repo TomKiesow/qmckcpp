@@ -31,6 +31,8 @@ namespace qmck
 
         logic_table(logic_table &&rhs) noexcept = default;
 
+        void sort();
+
     public:
 
         logic_table &operator=(logic_table lhs);

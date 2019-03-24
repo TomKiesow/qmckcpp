@@ -52,35 +52,3 @@ void qmck::swap(qmck::extended_logic_table &first, qmck::extended_logic_table &s
     swap(first.format, second.format);
     swap(first.logic_bundle_ranks, second.logic_bundle_ranks);
 }
-
-std::string qmck::extended_logic_table::to_string()
-{
-    std::string result{};
-
-    result += "inputs = ";
-    result += std::to_string(format.inputs_count);
-    result += "\noutputs = ";
-    result += std::to_string(format.outputs_count);
-    result += "\n";
-
-    for (auto const &it : logic_bundle_ranks)
-    {
-        if (!it.inputs.empty())
-        {
-            size_t the_end = it.inputs.size();
-            for (size_t the_idx{0}; the_idx < the_end; the_idx++)
-            {
-                std::bitset<32> input{it.inputs[the_idx]};
-                std::bitset<32> input_deduced_mask{it.input_deduced_masks[the_idx]};
-                std::bitset<32> output{it.outputs[the_idx]};
-                std::bitset<32> output_dc_mask{it.output_dc_masks[the_idx]};
-                std::bitset<32> output_done_mask{it.output_done_masks[the_idx]};
-
-                result += input.to_string() + " | " + input_deduced_mask.to_string() + " | " + output.to_string() + " | " + output_dc_mask.to_string() + " | " + output_done_mask.to_string() + '\n';
-            }
-            result += '\n';
-        }
-    }
-
-    return result;
-}
