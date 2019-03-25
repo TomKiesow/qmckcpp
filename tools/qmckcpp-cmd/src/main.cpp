@@ -22,8 +22,8 @@ int main(int const argc, char const **argv)
     table.sort();
     std::cout << table;
 
-    //    auto deduced = qmck::deduce(table);
-    //std::cout << deduced.to_string();
+    auto deduced = qmck::deduce(table);
+    std::cout << deduced << std::endl;
 
     return 0;
 }

@@ -1,12 +1,13 @@
 #include <qmck.hpp>
 
 #include <iostream>
+#include <list>
 
 namespace qmck
 {
     qmck::extended_logic_table deduce(qmck::logic_table table)
     {
-        std::cout << table;
+        std::cout << table << std::endl;
         // custom : logic_table
         //
         // inputs | outputs
@@ -35,7 +36,7 @@ namespace qmck
         //    +-> tread dont cares in the output as zeros
 
         qmck::extended_logic_table extended_table{table};
-        std::cout << extended_table;
+        std::cout << extended_table << std::endl;
 
         // =>
         // custom : 1. reduction_logic_table
@@ -64,16 +65,22 @@ namespace qmck
         // 0. find and merge possible rows from 1. reduction_logic_table into 2. reduction_logic_table
         //    +-> modify the output mask from 1. reduction_logic_table for found merges
 
-        for (int x = 0; x < 32; ++x)
-        {
-            qmck::extended_logic_table extended_table_next{};
+        std::list<extended_logic_table> all_extended_logic_tables;
+        all_extended_logic_tables.push_back(extended_table);
 
-            auto n = extended_table.logic_bundle_ranks.size() - 1;
+        while (!all_extended_logic_tables.back().empty())
+        {
+            auto &extended_table_current = all_extended_logic_tables.back();
+
+            all_extended_logic_tables.emplace_back(extended_logic_table{extended_table_current.format});
+            auto &extended_table_next = all_extended_logic_tables.back();
+
+            auto n = extended_table_current.logic_bundle_ranks.size() - 1;
             for (size_t i{0}; i < n; i++)
             {
                 auto &next_bundle = extended_table_next.logic_bundle_ranks[i];
-                auto &lower_bundle = extended_table.logic_bundle_ranks[i];
-                auto &upper_bundle = extended_table.logic_bundle_ranks[i + 1];
+                auto &lower_bundle = extended_table_current.logic_bundle_ranks[i];
+                auto &upper_bundle = extended_table_current.logic_bundle_ranks[i + 1];
 
                 auto lower_n = lower_bundle.inputs.size();
                 for (int lower_i{0}; lower_i < lower_n; lower_i++)
@@ -81,12 +88,6 @@ namespace qmck
                     auto upper_n = upper_bundle.inputs.size();
                     for (int upper_i{0}; upper_i < upper_n; upper_i++)
                     {
-                        uint32_t next_input{0};
-                        uint32_t next_input_deduced_mask{0};
-                        uint32_t next_output{0};
-                        uint32_t next_output_dc_mask{0};
-                        uint32_t next_output_done_mask{0};
-
                         auto &lower_input = lower_bundle.inputs[lower_i];
                         auto &lower_input_deduced_mask = lower_bundle.input_deduced_masks[lower_i];
                         auto &lower_output = lower_bundle.outputs[lower_i];
@@ -97,27 +98,43 @@ namespace qmck
                         auto &upper_input_deduced_mask = upper_bundle.input_deduced_masks[upper_i];
                         auto &upper_output = upper_bundle.outputs[upper_i];
                         auto &upper_output_dc_mask = upper_bundle.output_dc_masks[upper_i];
-                        auto &upper_output_done_mask = upper_bundle.output_done_masks[lower_i];
+                        auto &upper_output_done_mask = upper_bundle.output_done_masks[upper_i];
 
-                        next_input_deduced_mask = (lower_input ^ upper_input) | lower_input_deduced_mask;
-                        next_input = lower_input & (next_input_deduced_mask ^ UINT32_MAX);
-                        next_output_dc_mask = lower_output_dc_mask & upper_output_dc_mask;
-                        next_output = lower_output & upper_output;
-                        next_output_done_mask = (next_output ^ UINT32_MAX) | next_output_dc_mask;
+                        if (lower_input_deduced_mask == upper_input_deduced_mask && __builtin_popcount(lower_input ^ upper_input) == 1 && lower_output & upper_output)
+                        {
+                            uint32_t next_input{0};
+                            uint32_t next_input_deduced_mask{0};
+                            uint32_t next_output{0};
+                            uint32_t next_output_dc_mask{0};
+                            uint32_t next_output_done_mask{0};
 
-                        lower_output_done_mask |= upper_output;
-                        upper_output_done_mask |= lower_output;
+                            next_input_deduced_mask = (lower_input ^ upper_input) | lower_input_deduced_mask;
+                            next_input = lower_input & upper_input;
+                            next_output_dc_mask = lower_output_dc_mask & upper_output_dc_mask;
+                            next_output = lower_output & upper_output;
+                            next_output_done_mask = next_output_dc_mask;
 
-                        next_bundle.inputs.push_back(next_input);
-                        next_bundle.input_deduced_masks.push_back(next_input_deduced_mask);
-                        next_bundle.outputs.push_back(next_output);
-                        next_bundle.output_dc_masks.push_back(next_output_dc_mask);
-                        next_bundle.output_done_masks.push_back(next_output_done_mask);
+                            next_bundle.inputs.push_back(next_input);
+                            next_bundle.input_deduced_masks.push_back(next_input_deduced_mask);
+                            next_bundle.outputs.push_back(next_output);
+                            next_bundle.output_dc_masks.push_back(next_output_dc_mask);
+                            next_bundle.output_done_masks.push_back(next_output_done_mask);
+
+                            lower_output_done_mask |= next_output;
+                            upper_output_done_mask |= next_output;
+                        }
                     }
                 }
             }
-            //extended_table = qmck::extended_logic_table{extended_table_next};
-            std::cout << extended_table_next;
+        }
+
+        // remove empty one at the end
+        all_extended_logic_tables.pop_back();
+
+        int counter{0};
+        for (auto &extended_logic_table:all_extended_logic_tables)
+        {
+            std::cout << "table of order " << counter++ << std::endl << extended_logic_table << std::endl;
         }
 
         // =>
