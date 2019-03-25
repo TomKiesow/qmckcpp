@@ -25,7 +25,11 @@ namespace qmck
 
         extended_logic_table(extended_logic_table &&lhs) noexcept = default;
 
+        extended_logic_table(logic_table_format &format);
+
     public:
+
+        bool empty();
 
         extended_logic_table &operator=(extended_logic_table lhs);
 
