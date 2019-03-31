@@ -7,7 +7,7 @@ qmck::extended_logic_table::extended_logic_table(qmck::logic_table const &lhs)
     this->format = lhs.format;
 
     auto n = lhs.inputs.size();
-    for (size_t i = 0; i < n; i++)
+    for (size_t i = 0; i < n; ++i)
     {
         if (lhs.outputs[i]) // ignore zero output
         {
@@ -28,11 +28,11 @@ qmck::extended_logic_table::extended_logic_table(qmck::logic_table &&lhs)
     this->format = lhs.format;
 
     auto n = lhs.inputs.size();
-    for (size_t i = 0; i < n; i++)
+    for (size_t i = 0; i < n; ++i)
     {
         if (lhs.outputs[i]) // ignore zero output
         {
-            uint8_t rank = __builtin_popcount(lhs.inputs[i]);
+            auto rank = static_cast<uint8_t>(__builtin_popcount(lhs.inputs[i]));
             auto it = logic_bundle_ranks[rank];
 
             it.inputs.push_back(lhs.inputs[i]);
@@ -62,9 +62,9 @@ void qmck::swap(qmck::extended_logic_table &first, qmck::extended_logic_table &s
     swap(first.logic_bundle_ranks, second.logic_bundle_ranks);
 }
 
-bool qmck::extended_logic_table::empty()
+bool qmck::extended_logic_table::empty() const
 {
-    for (auto &bundle:logic_bundle_ranks)
+    for (auto const &bundle:logic_bundle_ranks)
     {
         if (!bundle.inputs.empty())
         {

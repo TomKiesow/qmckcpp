@@ -23,7 +23,7 @@ int main(int const argc, char const **argv)
     std::cout << table;
 
     auto deduced = qmck::deduce(table);
-    std::cout << deduced << std::endl;
+    std::cout << deduced << '\n';
 
     return 0;
 }

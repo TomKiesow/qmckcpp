@@ -1,13 +1,14 @@
 #include <qmck.hpp>
 
 #include <iostream>
+#include <vector>
 #include <list>
 
 namespace qmck
 {
     qmck::extended_logic_table deduce(qmck::logic_table table)
     {
-        std::cout << table << std::endl;
+        std::cout << table << '\n';
         // custom : logic_table
         //
         // inputs | outputs
@@ -65,28 +66,28 @@ namespace qmck
         // 0. find and merge possible rows from 1. reduction_logic_table into 2. reduction_logic_table
         //    +-> modify the output mask from 1. reduction_logic_table for found merges
 
-        std::list<extended_logic_table> all_extended_logic_tables;
+        std::vector<extended_logic_table> all_extended_logic_tables;
         all_extended_logic_tables.push_back(extended_table);
 
         while (!all_extended_logic_tables.back().empty())
         {
             auto &extended_table_current = all_extended_logic_tables.back();
 
-            all_extended_logic_tables.emplace_back(extended_logic_table{extended_table_current.format});
+            all_extended_logic_tables.push_back(extended_logic_table{extended_table_current.format});
             auto &extended_table_next = all_extended_logic_tables.back();
 
             auto n = extended_table_current.logic_bundle_ranks.size() - 1;
-            for (size_t i{0}; i < n; i++)
+            for (size_t i{0}; i < n; ++i)
             {
                 auto &next_bundle = extended_table_next.logic_bundle_ranks[i];
                 auto &lower_bundle = extended_table_current.logic_bundle_ranks[i];
                 auto &upper_bundle = extended_table_current.logic_bundle_ranks[i + 1];
 
                 auto lower_n = lower_bundle.inputs.size();
-                for (int lower_i{0}; lower_i < lower_n; lower_i++)
+                for (size_t lower_i{0}; lower_i < lower_n; ++lower_i)
                 {
                     auto upper_n = upper_bundle.inputs.size();
-                    for (int upper_i{0}; upper_i < upper_n; upper_i++)
+                    for (size_t upper_i{0}; upper_i < upper_n; ++upper_i)
                     {
                         auto &lower_input = lower_bundle.inputs[lower_i];
                         auto &lower_input_deduced_mask = lower_bundle.input_deduced_masks[lower_i];

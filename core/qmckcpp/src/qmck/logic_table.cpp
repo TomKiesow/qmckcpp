@@ -50,7 +50,7 @@ namespace
     inline char const *put_inputs(qmck::logic_array &inputs, qmck::logic_array &outputs, qmck::logic_array &output_masks, char const *table_c_str_begin, char const *table_c_str_end)
     {
         char const *it = table_c_str_begin;
-        for (; it < table_c_str_end; it++)
+        for (; it < table_c_str_end; ++it)
         {
             switch (*it)
             {
@@ -76,7 +76,7 @@ namespace
             case symbol::DONT_CARE:
             {
                 size_t input_end = inputs.size();
-                for (size_t input_idx{0u}; input_idx < input_end; input_idx++)
+                for (size_t input_idx{0u}; input_idx < input_end; ++input_idx)
                 {
                     inputs[input_idx] <<= 1;
                     inputs.push_back(inputs[input_idx] | uint32_t{1u});
@@ -104,14 +104,14 @@ namespace
     inline char const *put_outputs(qmck::logic_array &outputs, qmck::logic_array &output_masks, char const *table_c_str_begin, char const *table_c_str_end)
     {
         char const *it = table_c_str_begin;
-        for (; it < table_c_str_end; it++)
+        for (; it < table_c_str_end; ++it)
         {
             switch (*it)
             {
             case symbol::HIGH:
             {
                 size_t output_end = outputs.size();
-                for (size_t output_idx{0}; output_idx < output_end; output_idx++)
+                for (size_t output_idx{0}; output_idx < output_end; ++output_idx)
                 {
                     outputs[output_idx] <<= 1;
                     outputs[output_idx] |= uint32_t{1u};
@@ -124,7 +124,7 @@ namespace
             case symbol::LOW:
             {
                 size_t output_end = outputs.size();
-                for (size_t output_idx{0}; output_idx < output_end; output_idx++)
+                for (size_t output_idx{0}; output_idx < output_end; ++output_idx)
                 {
                     outputs[output_idx] <<= 1;
                     output_masks[output_idx] <<= 1;
@@ -135,7 +135,7 @@ namespace
             case symbol::DONT_CARE:
             {
                 size_t output_end = outputs.size();
-                for (size_t output_idx{0}; output_idx < output_end; output_idx++)
+                for (size_t output_idx{0}; output_idx < output_end; ++output_idx)
                 {
                     outputs[output_idx] <<= 1;
                     outputs[output_idx] |= uint32_t{1u};
@@ -226,7 +226,7 @@ void qmck::logic_table::sort()
     do
     {
         int i_min = i_border;
-        for (int i = i_border; i < inputs.size(); i++)
+        for (int i = i_border; i < inputs.size(); ++i)
         {
             if (inputs[i] < inputs[i_min])
             {

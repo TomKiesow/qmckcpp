@@ -29,7 +29,7 @@ namespace qmck
 
     public:
 
-        bool empty();
+        bool empty() const;
 
         extended_logic_table &operator=(extended_logic_table lhs);
 
