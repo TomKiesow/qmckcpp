@@ -38,26 +38,26 @@ std::ostream &operator<<(std::ostream &out, const qmck::extended_logic_table &lh
             {
                 for (int j{0}; j < lhs.format.inputs_count; ++j)
                 {
-                    if ((current_bundle.input_deduced_masks[row_i] >> (lhs.format.inputs_count - j)) & 1)
+                    if ((current_bundle.input_deduced_masks[row_i] >> (lhs.format.inputs_count - j - 1)) & 1)
                     {
                         out << 'X';
                     }
                     else
                     {
-                        out << ((current_bundle.inputs[row_i] >> (lhs.format.inputs_count - j)) & 1) ? '1' : '0';
+                        out << ((current_bundle.inputs[row_i] >> (lhs.format.inputs_count - j - 1)) & 1) ? '1' : '0';
                     }
                 }
                 out << " | ";
 
                 for (int k{0}; k < lhs.format.outputs_count; ++k)
                 {
-                    out << ((current_bundle.outputs[row_i] >> (lhs.format.outputs_count - k)) & 1) ? '1' : '0';
+                    out << ((current_bundle.outputs[row_i] >> (lhs.format.outputs_count - k - 1)) & 1) ? '1' : '0';
                 }
                 out << "  ";
 
                 for (int l{0}; l < lhs.format.outputs_count; ++l)
                 {
-                    out << ((current_bundle.output_done_masks[row_i] >> (lhs.format.outputs_count - l)) & 1) ? '1' : '0';
+                    out << ((current_bundle.output_done_masks[row_i] >> (lhs.format.outputs_count - l - 1)) & 1) ? '1' : '0';
                 }
 
                 if ((current_bundle.output_done_masks[row_i] & current_bundle.outputs[row_i]) == current_bundle.outputs[row_i])
@@ -93,19 +93,19 @@ std::ostream &operator<<(std::ostream &out, const qmck::logic_table &lhs)
     {
         for (int j{0}; j < lhs.format.inputs_count; ++j)
         {
-            out << ((lhs.inputs[i] >> (lhs.format.inputs_count - j)) & 1) ? '1' : '0';
+            out << ((lhs.inputs[i] >> (lhs.format.inputs_count - j - 1)) & 1) ? '1' : '0';
         }
         out << " | ";
 
         for (int k{0}; k < lhs.format.outputs_count; ++k)
         {
-            out << ((lhs.outputs[i] >> (lhs.format.outputs_count - k)) & 1) ? '1' : '0';
+            out << ((lhs.outputs[i] >> (lhs.format.outputs_count - k - 1)) & 1) ? '1' : '0';
         }
         out << "  ";
 
         for (int l{0}; l < lhs.format.outputs_count; ++l)
         {
-            out << ((lhs.output_dc_masks[i] >> (lhs.format.outputs_count - l)) & 1) ? '1' : '0';
+            out << ((lhs.output_dc_masks[i] >> (lhs.format.outputs_count - l - 1)) & 1) ? '1' : '0';
         }
         out << '\n';
     }

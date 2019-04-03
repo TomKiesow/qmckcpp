@@ -66,16 +66,13 @@ namespace qmck
         // 0. find and merge possible rows from 1. reduction_logic_table into 2. reduction_logic_table
         //    +-> modify the output mask from 1. reduction_logic_table for found merges
 
-        std::vector<extended_logic_table> all_extended_logic_tables;
-        all_extended_logic_tables.push_back(extended_table);
+        auto &extended_table_current = extended_table;
+        extended_logic_table extended_table_next{extended_table_current.format};
 
-        while (!all_extended_logic_tables.back().empty())
+        extended_logic_table all_prime_rows{extended_table_current.format};
+
+        while (!extended_table_current.empty())
         {
-            auto &extended_table_current = all_extended_logic_tables.back();
-
-            all_extended_logic_tables.push_back(extended_logic_table{extended_table_current.format});
-            auto &extended_table_next = all_extended_logic_tables.back();
-
             auto n = extended_table_current.logic_bundle_ranks.size() - 1;
             for (size_t i{0}; i < n; ++i)
             {
@@ -127,15 +124,29 @@ namespace qmck
                     }
                 }
             }
-        }
 
-        // remove empty one at the end
-        all_extended_logic_tables.pop_back();
+            // go through each row in extended_table_current
+            // and add it to all_prime_rows in case it is not completetly covered
+            for (int rank_i = 0; rank_i < 32; ++rank_i)
+            {
+                auto &rank = extended_table_current.logic_bundle_ranks[rank_i];
 
-        int counter{0};
-        for (auto &extended_logic_table:all_extended_logic_tables)
-        {
-            std::cout << "table of order " << counter++ << std::endl << extended_logic_table << std::endl;
+                for (int j = 0; j < rank.inputs.size(); ++j)
+                {
+                    if ((rank.outputs[j] & rank.output_done_masks[j]) != rank.outputs[j]){
+                        auto &target_bundle = all_prime_rows.logic_bundle_ranks[rank_i];
+
+                        target_bundle.inputs.push_back(rank.inputs[j]);
+                        target_bundle.input_deduced_masks.push_back(rank.input_deduced_masks[j]);
+                        target_bundle.outputs.push_back(rank.outputs[j]);
+                        target_bundle.output_dc_masks.push_back(rank.output_dc_masks[j]);
+                        target_bundle.output_done_masks.push_back(rank.output_done_masks[j]);
+                    }
+                }
+            }
+
+            extended_table_current = extended_table_next;
+            extended_table_next = extended_logic_table(extended_table_current.format);
         }
 
         // =>
@@ -281,6 +292,8 @@ namespace qmck
         // -------------------------     ----+-------+--------+------------
         //    8,9,10,11,12,13,14,15          | 1- -- |   00 1 |        11 0 <-
 
-        return extended_table;
+        // TODO: remove duplicates in all_prime_rows
+
+        return all_prime_rows;
     }
 }
