@@ -20,7 +20,7 @@ int main(int const argc, char const **argv)
 
     auto table = qmck::parse_logic_table(begin, end);
     table.sort();
-    std::cout << table;
+    std::cout << table << '\n';
 
     auto deduced = qmck::deduce(table);
     std::cout << deduced << '\n';

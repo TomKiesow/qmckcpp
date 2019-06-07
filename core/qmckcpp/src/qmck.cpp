@@ -3,68 +3,13 @@
 #include <iostream>
 #include <vector>
 #include <list>
+#include <iterator>
 
 namespace qmck
 {
     qmck::extended_logic_table deduce(qmck::logic_table table)
     {
-        std::cout << table << '\n';
-        // custom : logic_table
-        //
-        // inputs | outputs
-        // -------+--------
-        // 00 00  |    01 1
-        // 00 01  |    00 0
-        // 00 10  |    00 0
-        // 00 11  |    00 0
-        //
-        // 01 00  |    10 1
-        // 01 01  |    01 0
-        // 01 10  |    01 0
-        // 01 11  |    01 0
-        //
-        // 10 0x  |    00 1
-        // 10 1x  |    10 0
-        //
-        // 11 x0  |    00 x
-        // 11 x1  |    11 x
-
-        // TODO convert custom into 1. reduction_logic_table
-        // 0. delete rows where output equals false
-        // 1. blow up rows with dont cares in the input
-        // 2. groups rows in order how many ones it contains
-        // 3. create output_mask that is initialized as not output
-        //    +-> tread dont cares in the output as zeros
-
         qmck::extended_logic_table extended_table{table};
-        std::cout << extended_table << std::endl;
-
-        // =>
-        // custom : 1. reduction_logic_table
-        //
-        //  idx      1's | input | output | output_mask
-        // -----     ----+-------+--------+------------
-        //   0       0   | 00 00 |   01 1 |        10 0
-        // -----     ----+-------+--------+------------
-        //   4       1   | 01 00 |   10 1 |        01 0
-        //   8           | 10 00 |   00 1 |        11 0
-        // -----     ----+-------+--------+------------
-        //   5       2   | 01 01 |   01 0 |        10 1
-        //   6           | 01 10 |   01 0 |        10 1
-        //   9           | 10 01 |   00 1 |        11 0
-        //  10           | 10 10 |   10 0 |        01 1
-        //  12           | 11 00 |   00 x |        11 1
-        // -----     ----+-------+--------+------------
-        //   7       3   | 01 11 |   01 0 |        10 1
-        //  11           | 10 11 |   10 0 |        01 1
-        //  13           | 11 01 |   11 x |        00 1
-        //  14           | 11 10 |   00 x |        11 1
-        // -----     ----+-------+--------+------------
-        //  15       4   | 11 11 |   11 x |        00 1
-
-        // TODO create 2. reduction_logic_table
-        // 0. find and merge possible rows from 1. reduction_logic_table into 2. reduction_logic_table
-        //    +-> modify the output mask from 1. reduction_logic_table for found merges
 
         auto &extended_table_current = extended_table;
         extended_logic_table extended_table_next{extended_table_current.format};
@@ -126,14 +71,15 @@ namespace qmck
             }
 
             // go through each row in extended_table_current
-            // and add it to all_prime_rows in case it is not completetly covered
+            // and add it to all_prime_rows in case it is not completely covered
             for (int rank_i = 0; rank_i < 32; ++rank_i)
             {
                 auto &rank = extended_table_current.logic_bundle_ranks[rank_i];
 
                 for (int j = 0; j < rank.inputs.size(); ++j)
                 {
-                    if ((rank.outputs[j] & rank.output_done_masks[j]) != rank.outputs[j]){
+                    if ((rank.outputs[j] & rank.output_done_masks[j]) != rank.outputs[j])
+                    {
                         auto &target_bundle = all_prime_rows.logic_bundle_ranks[rank_i];
 
                         target_bundle.inputs.push_back(rank.inputs[j]);
@@ -149,150 +95,36 @@ namespace qmck
             extended_table_next = extended_logic_table(extended_table_current.format);
         }
 
-        // =>
-        // custom : 1. reduction_logic_table
-        //
-        //  idx      1's | input | output | output_mask
-        // -----     ----+-------+--------+------------
-        //   0       0   | 00 00 |   01 1 |        10 1 <-
-        // -----     ----+-------+--------+------------
-        //   4       1   | 01 00 |   10 1 |        01 1 <-
-        //   8           | 10 00 |   00 1 |        11 1
-        // -----     ----+-------+--------+------------
-        //   5       2   | 01 01 |   01 0 |        11 1
-        //   6           | 01 10 |   01 0 |        11 1
-        //   9           | 10 01 |   00 1 |        11 1
-        //  10           | 10 10 |   10 0 |        11 1
-        //  12           | 11 00 |   00 x |        11 1
-        // -----     ----+-------+--------+------------
-        //   7       3   | 01 11 |   01 0 |        11 1
-        //  11           | 10 11 |   10 0 |        11 1
-        //  13           | 11 01 |   11 x |        01 1 <-
-        //  14           | 11 10 |   00 x |        11 1
-        // -----     ----+-------+--------+------------
-        //  15       4   | 11 11 |   11 x |        11 1
+        // go through all_prime_rows and remove duplicates
+        for (int rank_i = 0; rank_i < 32; ++rank_i)
+        {
+            auto &rank = all_prime_rows.logic_bundle_ranks[rank_i];
 
-        // =>
-        // custom : 2. reduction_logic_table
-        //
-        //   idx       1's | input | output | output_mask
-        // -------     ----+-------+--------+------------
-        //   0,4       0   | 0- 00 |   00 1 |        11 0
-        //   0,8           | -0 00 |   00 1 |        11 0
-        // -------     ----+-------+--------+------------
-        //   4,5       1   | 01 0- |   00 0 |        11 1
-        //   4,6           | 01 -0 |   00 0 |        11 1
-        //   4,12          | -1 00 |   00 1 |        11 0
-        //   8,9           | 10 0- |   00 1 |        11 0
-        //   8,10          | 10 -0 |   00 0 |        11 1
-        //   8,12          | 1- 00 |   00 1 |        11 0
-        // -------     ----+-------+--------+------------
-        //   5,7       2   | 01 -1 |   01 0 |        10 1
-        //   5,13          | -1 01 |   01 0 |        10 1
-        //   6,7           | 01 1- |   01 0 |        10 1
-        //   6,14          | -1 10 |   00 0 |        11 1
-        //   9,11          | 10 -1 |   00 0 |        11 1
-        //   9,13          | 1- 01 |   00 1 |        11 0
-        //  10,11          | 10 1- |   10 0 |        01 1
-        //  10,14          | 1- 10 |   00 0 |        11 1
-        //  12,13          | 11 0- |   00 x |        11 1
-        //  12,14          | 11 -0 |   00 x |        11 1
-        // -------     ----+-------+--------+------------
-        //   7,15      3   | -1 11 |   01 0 |        10 1
-        //  11,15          | 1- 11 |   10 0 |        01 1
-        //  13,15          | 11 -1 |   11 x |        00 1
-        //  14,15          | 11 1- |   00 x |        11 1
+            for (int row_i_upper = 0; row_i_upper < rank.inputs.size(); ++row_i_upper)
+            {
+                auto &upper_inputs = rank.inputs[row_i_upper];
+                auto &upper_inputs_deduced_masks = rank.input_deduced_masks[row_i_upper];
 
-        // =>
-        // custom : 2. reduction_logic_table
-        //
-        //   idx       1's | input | output | output_mask
-        // -------     ----+-------+--------+------------
-        //   0,4       0   | 0- 00 |   00 1 |        11 0
-        //   0,8           | -0 00 |   00 1 |        11 0
-        // -------     ----+-------+--------+------------
-        //   4,12          | -1 00 |   00 1 |        11 0
-        //   8,9           | 10 0- |   00 1 |        11 0
-        //   8,12          | 1- 00 |   00 1 |        11 0
-        // -------     ----+-------+--------+------------
-        //   5,7       2   | 01 -1 |   01 0 |        10 1
-        //   5,13          | -1 01 |   01 0 |        10 1
-        //   6,7           | 01 1- |   01 0 |        10 1
-        //   9,13          | 1- 01 |   00 1 |        11 0
-        //  10,11          | 10 1- |   10 0 |        01 1
-        //  12,13          | 11 0- |   00 x |        11 1
-        //  12,14          | 11 -0 |   00 x |        11 1
-        // -------     ----+-------+--------+------------
-        //   7,15      3   | -1 11 |   01 0 |        10 1
-        //  11,15          | 1- 11 |   10 0 |        01 1
-        //  13,15          | 11 -1 |   11 x |        00 1
-        //  14,15          | 11 1- |   00 x |        11 1
+                for (int row_i_lower = 0; row_i_lower < rank.inputs.size(); ++row_i_lower)
+                {
+                    if (row_i_lower != row_i_upper)
+                    {
+                        auto &lower_inputs = rank.inputs[row_i_lower];
+                        auto &lower_inputs_deduced_masks = rank.input_deduced_masks[row_i_lower];
 
-        // TODO create 3. - n. reduction_logic_table with a loop
-
-        // =>
-        // custom : 2. reduction_logic_table
-        //
-        //   idx       1's | input | output | output_mask
-        // -------     ----+-------+--------+------------
-        //   0,4       0   | 0- 00 |   00 1 |        11 1
-        //   0,8           | -0 00 |   00 1 |        11 1
-        // -------     ----+-------+--------+------------
-        //   4,12          | -1 00 |   00 1 |        11 1
-        //   8,9           | 10 0- |   00 1 |        11 1
-        //   8,12          | 1- 00 |   00 1 |        11 1
-        // -------     ----+-------+--------+------------
-        //   5,7       2   | 01 -1 |   01 0 |        11 1
-        //   5,13          | -1 01 |   01 0 |        11 1
-        //   6,7           | 01 1- |   01 0 |        10 1 <-
-        //   9,13          | 1- 01 |   00 1 |        11 1
-        //  10,11          | 10 1- |   10 0 |        01 1 <-
-        //  12,13          | 11 0- |   00 x |        11 1
-        //  12,14          | 11 -0 |   00 x |        11 1
-        // -------     ----+-------+--------+------------
-        //   7,15      3   | -1 11 |   01 0 |        11 1
-        //  11,15          | 1- 11 |   10 0 |        01 1 <-
-        //  13,15          | 11 -1 |   11 x |        01 1 <-
-        //  14,15          | 11 1- |   00 x |        11 1
-
-        // =>
-        // custom : 3. reduction_logic_table
-        //
-        //      idx          1's | input | output | output_mask
-        // -------------     ----+-------+--------+------------
-        //    0,4,8,12       0   | -- 00 |   00 1 |        11 0
-        //    0,4,8,12           | -- 00 |   00 1 |        11 0
-        // -------------     ----+-------+--------+------------
-        //    8,9,10,11          | 10 -- |   00 1 |        11 0
-        //    8,9,12,13          | 1- 0- |   00 1 |        11 0
-        //   8,12,9,13           | 1- 0- |   00 1 |        11 0
-        // -------------     ----+-------+--------+------------
-        //    5,7,13,15      2   | -1 -1 |   01 0 |        10 1
-        //   5,13,7,15           | -1 -1 |   01 0 |        10 1
-        //  12,13,14,15          | 11 -- |   00 x |        11 1
-        //  12,14,13,15          | 11 -- |   00 x |        11 1
-
-        // =>
-        // custom : 3. reduction_logic_table
-        //
-        //      idx          1's | input | output | output_mask
-        // -------------     ----+-------+--------+------------
-        //    0,4,8,12       0   | -- 00 |   00 1 |        11 0 <-
-        // -------------     ----+-------+--------+------------
-        //    8,9,10,11          | 10 -- |   00 1 |        11 1
-        //    8,9,12,13          | 1- 0- |   00 1 |        11 0 <-
-        // -------------     ----+-------+--------+------------
-        //    5,7,13,15      2   | -1 -1 |   01 0 |        10 1 <-
-        //  12,13,14,15          | 11 -- |   00 x |        11 1
-
-        // =>
-        // custom : 4. reduction_logic_table
-        //
-        //            idx                1's | input | output | output_mask
-        // -------------------------     ----+-------+--------+------------
-        //    8,9,10,11,12,13,14,15          | 1- -- |   00 1 |        11 0 <-
-
-        // TODO: remove duplicates in all_prime_rows
+                        if (upper_inputs_deduced_masks == lower_inputs_deduced_masks && (upper_inputs & ~upper_inputs_deduced_masks) == (lower_inputs & ~lower_inputs_deduced_masks))
+                        {
+                            rank.inputs.erase(rank.inputs.begin() + row_i_lower);
+                            rank.input_deduced_masks.erase(rank.input_deduced_masks.begin() + row_i_lower);
+                            rank.outputs.erase(rank.outputs.begin() + row_i_lower);
+                            rank.output_done_masks.erase(rank.output_done_masks.begin() + row_i_lower);
+                            rank.output_dc_masks.erase(rank.output_dc_masks.begin() + row_i_lower);
+                            row_i_lower--; // compensate for deleted row, otherwise the row after the deleted one would be skipped
+                        }
+                    }
+                }
+            }
+        }
 
         return all_prime_rows;
     }
