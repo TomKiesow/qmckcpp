@@ -16,10 +16,10 @@ namespace qmck
 
         quine_table all_prime_rows{quine_table_current.format};
 
+        auto ranks_size = quine_table_current.ranks.size();
         while (!quine_table_current.empty())
         {
-            auto n = quine_table_current.ranks.size();
-            for (size_t i{0}; i < n; ++i)
+            for (size_t i{0}; i < ranks_size; ++i)
             {
                 auto &next_bundle = quine_table_next.ranks[i];
                 auto &lower_bundle = quine_table_current.ranks[i];
@@ -56,7 +56,7 @@ namespace qmck
 
             // go through each row in quine_table_current
             // and add it to all_prime_rows in case it is not completely covered
-            for (int rank_i = 0; rank_i < 32; ++rank_i)
+            for (int rank_i = 0; rank_i < ranks_size; ++rank_i)
             {
                 auto &rank = quine_table_current.ranks[rank_i];
 
@@ -75,7 +75,7 @@ namespace qmck
 
 
         // go through all_prime_rows and remove duplicates
-        for (int rank_i = 0; rank_i < 32; ++rank_i)
+        for (int rank_i = 0; rank_i < ranks_size; ++rank_i)
         {
             auto &rank = all_prime_rows.ranks[rank_i];
 

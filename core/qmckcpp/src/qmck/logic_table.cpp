@@ -2,6 +2,7 @@
 
 #include <qmck/logic_table.hpp>
 #include <qmck/logic_row.hpp>
+#include <qmck/logic_value.hpp>
 
 #include <bitset>
 #include <regex>
@@ -84,7 +85,7 @@ namespace
                     rows[row_idx].inputs <<= 1u;
 
                     qmck::logic_row new_row{};
-                    new_row.inputs = rows[row_idx].inputs | uint32_t{1u};
+                    new_row.inputs = rows[row_idx].inputs | qmck::logic_value{1u};
                     rows.push_back(new_row);
                 }
 
@@ -117,7 +118,7 @@ namespace
                 for (size_t row_idx{0}; row_idx < row_count; ++row_idx)
                 {
                     rows[row_idx].outputs <<= 1u;
-                    rows[row_idx].outputs |= uint32_t{1u};
+                    rows[row_idx].outputs |= qmck::logic_value{1u};
 
                     rows[row_idx].outputs_dc_mask <<= 1u;
                 }
@@ -141,10 +142,10 @@ namespace
                 for (size_t row_idx{0}; row_idx < row_count; ++row_idx)
                 {
                     rows[row_idx].outputs <<= 1u;
-                    rows[row_idx].outputs |= uint32_t{1u};
+                    rows[row_idx].outputs |= qmck::logic_value{1u};
 
                     rows[row_idx].outputs_dc_mask <<= 1u;
-                    rows[row_idx].outputs_dc_mask |= uint32_t{1u};
+                    rows[row_idx].outputs_dc_mask |= qmck::logic_value{1u};
                 }
 
                 break;
