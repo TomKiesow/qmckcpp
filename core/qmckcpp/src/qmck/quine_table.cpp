@@ -1,0 +1,51 @@
+#include <qmck/quine_table.hpp>
+#include <iostream>
+
+qmck::quine_table::quine_table(qmck::logic_table &&lhs)
+{
+    this->format = lhs.format;
+
+    for (auto &lrow : lhs.rows)
+    {
+        if (lrow.outputs)
+        {
+            quine_row qrow{lrow};
+
+            int rank_i = __builtin_popcount(qrow.inputs);
+            this->ranks[rank_i].push_back(qrow);
+        }
+    }
+}
+
+qmck::quine_table::quine_table(const qmck::logic_table &lhs)
+{
+    this->format = lhs.format;
+
+    for (auto &lrow : lhs.rows)
+    {
+        if (lrow.outputs)
+        {
+            quine_row qrow{lrow};
+
+            int rank_i = __builtin_popcount(qrow.inputs);
+            this->ranks[rank_i].push_back(qrow);
+        }
+    }
+}
+
+qmck::quine_table::quine_table(qmck::generic_table_format &format)
+{
+    this->format = format;
+}
+
+bool qmck::quine_table::empty() const
+{
+    for (auto &rank : ranks)
+    {
+        if (!rank.empty())
+        {
+            return false;
+        }
+    }
+    return true;
+}

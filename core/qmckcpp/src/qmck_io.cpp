@@ -1,66 +1,50 @@
 #include <qmck_io.hpp>
 
-std::ostream &operator<<(std::ostream &out, const qmck::extended_logic_bundle &lhs)
+std::ostream &operator<<(std::ostream &out, const qmck::quine_row &lhs)
 {
-    out << "qmck::extended_logic_bundle {\n";
-    out << "    " << lhs.inputs << "\n";
-    out << "    " << lhs.inputs << "\n";
-    out << "    " << lhs.inputs << "\n";
-    out << "    " << lhs.inputs << "\n";
-    out << "    " << lhs.inputs << "\n";
-    out << "    " << lhs.inputs << "\n";
-    out << "    " << lhs.inputs << "\n";
-    out << "    " << lhs.inputs << "\n";
-    out << "    " << lhs.inputs << "\n";
-    out << "    " << lhs.inputs << "\n";
-    out << "    " << lhs.inputs << "\n";
-    out << "    " << lhs.inputs << "\n";
-    out << "    " << lhs.inputs << "\n";
-    out << "    " << lhs.inputs << "\n";
-    out << "    " << lhs.inputs << "\n";
-    out << "}\n";
+
 
     return out;
 }
 
-std::ostream &operator<<(std::ostream &out, const qmck::extended_logic_table &lhs)
+std::ostream &operator<<(std::ostream &out, const qmck::quine_table &lhs)
 {
-    out << "qmck::extended_logic_table {\n";
-    out << "logic_table_format=" << lhs.format << ",\n\n";
+    out << "qmck::quine_table {\n";
+    out << "generic_table_format=" << lhs.format << ",\n\n";
     out << "----------------\n";
 
-    for (size_t bundle_i{0}; bundle_i < lhs.logic_bundle_ranks.size(); ++bundle_i)
+    for (size_t bundle_i{0}; bundle_i < lhs.ranks.size(); ++bundle_i)
     {
-        auto const &current_bundle = lhs.logic_bundle_ranks[bundle_i];
-        if (!current_bundle.inputs.empty())
+        auto const &current_bundle = lhs.ranks[bundle_i];
+        if (!current_bundle.empty())
         {
-            for (size_t row_i{0}; row_i < current_bundle.inputs.size(); ++row_i)
+            for (size_t row_i{0}; row_i < current_bundle.size(); ++row_i)
             {
                 for (int j{0}; j < lhs.format.inputs_count; ++j)
                 {
-                    if ((current_bundle.input_deduced_masks[row_i] >> (lhs.format.inputs_count - j - 1)) & 1)
+                    if ((current_bundle[row_i].inputs_deduced_mask >> (lhs.format.inputs_count - j - 1)) & 1u)
                     {
                         out << 'X';
                     }
                     else
                     {
-                        out << ((current_bundle.inputs[row_i] >> (lhs.format.inputs_count - j - 1)) & 1) ? '1' : '0';
+                        out << ((current_bundle[row_i].inputs >> (lhs.format.inputs_count - j - 1)) & 1u) ? '1' : '0';
                     }
                 }
                 out << " | ";
 
                 for (int k{0}; k < lhs.format.outputs_count; ++k)
                 {
-                    out << ((current_bundle.outputs[row_i] >> (lhs.format.outputs_count - k - 1)) & 1) ? '1' : '0';
+                    out << ((current_bundle[row_i].outputs >> (lhs.format.outputs_count - k - 1)) & 1u) ? '1' : '0';
                 }
                 out << "  ";
 
                 for (int l{0}; l < lhs.format.outputs_count; ++l)
                 {
-                    out << ((current_bundle.output_done_masks[row_i] >> (lhs.format.outputs_count - l - 1)) & 1) ? '1' : '0';
+                    out << ((current_bundle[row_i].outputs_done_mask >> (lhs.format.outputs_count - l - 1)) & 1u) ? '1' : '0';
                 }
 
-                if ((current_bundle.output_done_masks[row_i] & current_bundle.outputs[row_i]) == current_bundle.outputs[row_i])
+                if ((current_bundle[row_i].outputs_done_mask & current_bundle[row_i].outputs) == current_bundle[row_i].outputs)
                 {
                     out << " covered";
                 }
@@ -79,7 +63,7 @@ std::ostream &operator<<(std::ostream &out, const qmck::extended_logic_table &lh
     return out;
 }
 
-std::ostream &operator<<(std::ostream &out, const qmck::logic_array &lhs)
+std::ostream &operator<<(std::ostream &out, const qmck::logic_row &lhs)
 {
     return out;
 }
@@ -87,25 +71,25 @@ std::ostream &operator<<(std::ostream &out, const qmck::logic_array &lhs)
 std::ostream &operator<<(std::ostream &out, const qmck::logic_table &lhs)
 {
     out << "qmck::logic_table{\n";
-    out << "logic_table_format=" << lhs.format << ",\n\n";
+    out << "generic_table_format=" << lhs.format << ",\n\n";
 
-    for (size_t i = 0; i < lhs.inputs.size(); ++i)
+    for (size_t i = 0; i < lhs.rows.size(); ++i)
     {
         for (int j{0}; j < lhs.format.inputs_count; ++j)
         {
-            out << ((lhs.inputs[i] >> (lhs.format.inputs_count - j - 1)) & 1) ? '1' : '0';
+            out << ((lhs.rows[i].inputs >> (lhs.format.inputs_count - j - 1)) & 1u) ? '1' : '0';
         }
         out << " | ";
 
         for (int k{0}; k < lhs.format.outputs_count; ++k)
         {
-            out << ((lhs.outputs[i] >> (lhs.format.outputs_count - k - 1)) & 1) ? '1' : '0';
+            out << ((lhs.rows[i].outputs >> (lhs.format.outputs_count - k - 1)) & 1u) ? '1' : '0';
         }
         out << "  ";
 
         for (int l{0}; l < lhs.format.outputs_count; ++l)
         {
-            out << ((lhs.output_dc_masks[i] >> (lhs.format.outputs_count - l - 1)) & 1) ? '1' : '0';
+            out << ((lhs.rows[i].outputs_dc_mask >> (lhs.format.outputs_count - l - 1)) & 1u) ? '1' : '0';
         }
         out << '\n';
     }
@@ -114,7 +98,7 @@ std::ostream &operator<<(std::ostream &out, const qmck::logic_table &lhs)
     return out;
 }
 
-std::ostream &operator<<(std::ostream &out, const qmck::logic_table_format &lhs)
+std::ostream &operator<<(std::ostream &out, const qmck::generic_table_format &lhs)
 {
     out << "qmck::table_format{inputs_count=" << lhs.inputs_count << ", outputs_count=" << lhs.outputs_count << "}";
     return out;

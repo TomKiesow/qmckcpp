@@ -1,6 +1,7 @@
 #include <utility>
 
 #include <qmck/logic_table.hpp>
+#include <qmck/logic_row.hpp>
 
 #include <bitset>
 #include <regex>
@@ -16,7 +17,7 @@ namespace
         DONT_CARE = 'x'
     };
 
-    inline char const *put_logic_table_format(qmck::logic_table_format &format, char const *table_c_str_begin, char const *table_c_str_end)
+    inline char const *put_logic_table_format(qmck::generic_table_format &format, char const *table_c_str_begin, char const *table_c_str_end)
     {
         static std::regex const inputs_regex{R"(\s*inputs\s*=\s*([[:digit:]]+))"};
         static std::regex const outputs_regex{R"(\s*outputs\s*=\s*([[:digit:]]+))"};
@@ -47,8 +48,10 @@ namespace
         return it;
     }
 
-    inline char const *put_inputs(qmck::logic_array &inputs, qmck::logic_array &outputs, qmck::logic_array &output_masks, char const *table_c_str_begin, char const *table_c_str_end)
+    inline char const *put_inputs(std::vector<qmck::logic_row> &rows, char const *table_c_str_begin, char const *table_c_str_end)
     {
+        rows.push_back(qmck::logic_row{});
+
         char const *it = table_c_str_begin;
         for (; it < table_c_str_end; ++it)
         {
@@ -56,33 +59,33 @@ namespace
             {
             case symbol::HIGH:
             {
-                for (auto &input:inputs)
+                for (auto &row:rows)
                 {
-                    input <<= 1;
-                    input |= 1;
+                    row.inputs <<= 1u;
+                    row.inputs |= 1u;
                 }
 
                 break;
             }
             case symbol::LOW:
             {
-                for (auto &input:inputs)
+                for (auto &row:rows)
                 {
-                    input <<= 1;
+                    row.inputs <<= 1u;
                 }
 
                 break;
             }
             case symbol::DONT_CARE:
             {
-                size_t input_end = inputs.size();
-                for (size_t input_idx{0u}; input_idx < input_end; ++input_idx)
+                size_t row_count = rows.size();
+                for (size_t row_idx{0u}; row_idx < row_count; ++row_idx)
                 {
-                    inputs[input_idx] <<= 1;
-                    inputs.push_back(inputs[input_idx] | uint32_t{1u});
+                    rows[row_idx].inputs <<= 1u;
 
-                    outputs.push_back(uint32_t{0u});
-                    output_masks.push_back(uint32_t{0u});
+                    qmck::logic_row new_row{};
+                    new_row.inputs = rows[row_idx].inputs | uint32_t{1u};
+                    rows.push_back(new_row);
                 }
 
                 break;
@@ -101,7 +104,7 @@ namespace
         return it;
     }
 
-    inline char const *put_outputs(qmck::logic_array &outputs, qmck::logic_array &output_masks, char const *table_c_str_begin, char const *table_c_str_end)
+    inline char const *put_outputs(std::vector<qmck::logic_row> &rows, char const *table_c_str_begin, char const *table_c_str_end)
     {
         char const *it = table_c_str_begin;
         for (; it < table_c_str_end; ++it)
@@ -110,38 +113,38 @@ namespace
             {
             case symbol::HIGH:
             {
-                size_t output_end = outputs.size();
-                for (size_t output_idx{0}; output_idx < output_end; ++output_idx)
+                size_t row_count = rows.size();
+                for (size_t row_idx{0}; row_idx < row_count; ++row_idx)
                 {
-                    outputs[output_idx] <<= 1;
-                    outputs[output_idx] |= uint32_t{1u};
+                    rows[row_idx].outputs <<= 1u;
+                    rows[row_idx].outputs |= uint32_t{1u};
 
-                    output_masks[output_idx] <<= 1;
+                    rows[row_idx].outputs_dc_mask <<= 1u;
                 }
 
                 break;
             }
             case symbol::LOW:
             {
-                size_t output_end = outputs.size();
-                for (size_t output_idx{0}; output_idx < output_end; ++output_idx)
+                size_t row_count = rows.size();
+                for (size_t row_idx{0}; row_idx < row_count; ++row_idx)
                 {
-                    outputs[output_idx] <<= 1;
-                    output_masks[output_idx] <<= 1;
+                    rows[row_idx].outputs <<= 1u;
+                    rows[row_idx].outputs_dc_mask <<= 1u;
                 }
 
                 break;
             }
             case symbol::DONT_CARE:
             {
-                size_t output_end = outputs.size();
-                for (size_t output_idx{0}; output_idx < output_end; ++output_idx)
+                size_t row_count = rows.size();
+                for (size_t row_idx{0}; row_idx < row_count; ++row_idx)
                 {
-                    outputs[output_idx] <<= 1;
-                    outputs[output_idx] |= uint32_t{1u};
+                    rows[row_idx].outputs <<= 1u;
+                    rows[row_idx].outputs |= uint32_t{1u};
 
-                    output_masks[output_idx] <<= 1;
-                    output_masks[output_idx] |= uint32_t{1u};
+                    rows[row_idx].outputs_dc_mask <<= 1u;
+                    rows[row_idx].outputs_dc_mask |= uint32_t{1u};
                 }
 
                 break;
@@ -161,22 +164,6 @@ namespace
     }
 }
 
-qmck::logic_table::logic_table(qmck::logic_table_format format, qmck::logic_array inputs, qmck::logic_array outputs) : format(std::move(format)), inputs(std::move(inputs)), outputs(std::move(outputs))
-{
-}
-
-qmck::logic_table::logic_table(qmck::logic_table_format format, qmck::logic_array &&inputs, qmck::logic_array &&outputs) : format(std::move(format)), inputs(inputs), outputs(outputs)
-{
-}
-
-qmck::logic_table::logic_table(qmck::logic_table_format format, qmck::logic_array inputs, qmck::logic_array outputs, qmck::logic_array output_masks) : format(std::move(format)), inputs(std::move(inputs)), outputs(std::move(outputs)), output_dc_masks(std::move(output_masks))
-{
-}
-
-qmck::logic_table::logic_table(qmck::logic_table_format format, qmck::logic_array &&inputs, qmck::logic_array &&outputs, qmck::logic_array &&output_masks) : format(std::move(format)), inputs(inputs), outputs(outputs), output_dc_masks(output_masks)
-{
-}
-
 qmck::logic_table &qmck::logic_table::operator=(qmck::logic_table lhs)
 {
     swap(*this, lhs);
@@ -187,9 +174,7 @@ void qmck::swap(qmck::logic_table &first, qmck::logic_table &second)
 {
     using std::swap;
     swap(first.format, second.format);
-    swap(first.inputs, second.inputs);
-    swap(first.outputs, second.outputs);
-    swap(first.output_dc_masks, second.output_dc_masks);
+    swap(first.rows, second.rows);
 }
 
 qmck::logic_table qmck::parse_logic_table(char const *i, char const *n)
@@ -199,20 +184,12 @@ qmck::logic_table qmck::parse_logic_table(char const *i, char const *n)
 
     while (i < n)
     {
-        qmck::logic_array row_inputs{};
-        qmck::logic_array row_outputs{};
-        qmck::logic_array row_output_masks{};
+        std::vector<qmck::logic_row> rows_new;
 
-        row_inputs.push_back(uint32_t{0u});
-        row_outputs.push_back(uint32_t{0u});
-        row_output_masks.push_back(uint32_t{0u});
+        i = put_inputs(rows_new, i, n);
+        i = put_outputs(rows_new, i, n);
 
-        i = put_inputs(row_inputs, row_outputs, row_output_masks, i, n);
-        i = put_outputs(row_outputs, row_output_masks, i, n);
-
-        table.inputs.insert(table.inputs.end(), row_inputs.begin(), row_inputs.end());
-        table.outputs.insert(table.outputs.end(), row_outputs.begin(), row_outputs.end());
-        table.output_dc_masks.insert(table.output_dc_masks.end(), row_output_masks.begin(), row_output_masks.end());
+        table.rows.insert(table.rows.end(), rows_new.begin(), rows_new.end());
     }
 
     return table;
@@ -226,25 +203,17 @@ void qmck::logic_table::sort()
     do
     {
         int i_min = i_border;
-        for (int i = i_border; i < inputs.size(); ++i)
+        for (int i = i_border; i < rows.size(); ++i)
         {
-            if (inputs[i] < inputs[i_min])
+            if (rows[i].inputs < rows[i_min].inputs)
             {
                 i_min = i;
             }
         }
 
-        uint32_t tmp = inputs[i_border];    // bekommt man den typ auch irgendwie aus dem logic_array heraus?
-        inputs[i_border] = inputs[i_min];
-        inputs[i_min] = tmp;
-
-        tmp = outputs[i_border];
-        outputs[i_border] = outputs[i_min];
-        outputs[i_min] = tmp;
-
-        tmp = output_dc_masks[i_border];
-        output_dc_masks[i_border] = output_dc_masks[i_min];
-        output_dc_masks[i_min] = tmp;
+        qmck::logic_row tmp = rows[i_border];
+        rows[i_border] = rows[i_min];
+        rows[i_min] = tmp;
     }
-    while (i_border++ < inputs.size());
+    while (i_border++ < rows.size());
 }

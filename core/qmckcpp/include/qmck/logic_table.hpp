@@ -1,30 +1,21 @@
 #pragma once
 
-#include <qmck/logic_array.hpp>
-#include <qmck/logic_table_format.hpp>
+#include <qmck/logic_row.hpp>
+#include <qmck/generic_table_format.hpp>
 
 #include <cstdint>
 #include <string>
+#include <vector>
 
 namespace qmck
 {
     struct logic_table
     {
     public:
-        logic_table_format format{};
-        logic_array inputs{};
-        logic_array outputs{};
-        logic_array output_dc_masks{};
+        generic_table_format format{};
+        std::vector<logic_row> rows;
 
     public:
-        logic_table(logic_table_format table_format, logic_array &&inputs, logic_array &&outputs, logic_array &&output_masks);
-
-        logic_table(logic_table_format table_format, logic_array inputs, logic_array outputs, logic_array output_masks);
-
-        logic_table(logic_table_format table_format, logic_array &&inputs, logic_array &&outputs);
-
-        logic_table(logic_table_format table_format, logic_array inputs, logic_array outputs);
-
         logic_table() = default;
 
         logic_table(logic_table const &lhs) = default;
