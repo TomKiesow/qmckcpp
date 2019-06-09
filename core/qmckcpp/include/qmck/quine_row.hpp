@@ -4,6 +4,8 @@
 #include <qmck/logic_row.hpp>
 #include <qmck/generic_table_format.hpp>
 
+#include <vector>
+
 namespace qmck
 {
     struct quine_row
@@ -17,7 +19,12 @@ namespace qmck
 
     public:
         quine_row() = default;
+
         explicit quine_row(logic_row const &lrow);
+
         explicit quine_row(logic_row &&lrow) noexcept;
+
+    public:
+        std::vector<logic_value> calculate_indices() const;
     };
 }

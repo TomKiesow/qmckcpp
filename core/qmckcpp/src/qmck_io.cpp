@@ -46,11 +46,16 @@ std::ostream &operator<<(std::ostream &out, const qmck::quine_table &lhs)
 
                 if ((current_bundle[row_i].outputs_done_mask & current_bundle[row_i].outputs) == current_bundle[row_i].outputs)
                 {
-                    out << " covered";
+                    out << " (covered) ";
                 }
                 else
                 {
-                    out << " not covered";
+                    out << " (not covered) ";
+                }
+
+                auto indices = current_bundle[row_i].calculate_indices();
+                for(auto &index : indices){
+                    out << index << ',';
                 }
 
                 out << '\n';
