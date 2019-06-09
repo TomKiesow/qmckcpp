@@ -8,4 +8,4 @@ outputs = 8
 100 | 0001xxxx;
 101 | 001xxxxx;
 110 | 01xxxxxx;
-111 | 1xxxxxxx
+111 | 1xxxxxxx;

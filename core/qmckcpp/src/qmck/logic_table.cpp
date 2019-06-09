@@ -161,6 +161,8 @@ namespace
             }
         }
 
+        rows.clear(); // delete all rows created if line had no symbol::ROW_DELIMINATOR at the end
+
         return it;
     }
 }
