@@ -3,7 +3,6 @@
 #include <qmck/logic_row.hpp>
 #include <qmck/generic_table_format.hpp>
 
-#include <cstdint>
 #include <string>
 #include <vector>
 

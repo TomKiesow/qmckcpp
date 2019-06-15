@@ -13,12 +13,12 @@ std::ostream &operator<<(std::ostream &out, const qmck::quine_table &lhs)
     out << "generic_table_format=" << lhs.format << ",\n\n";
     out << "----------------\n";
 
-    for (size_t bundle_i{0}; bundle_i < lhs.ranks.size(); ++bundle_i)
+    for (std::size_t bundle_i{0}; bundle_i < lhs.ranks.size(); ++bundle_i)
     {
         auto const &current_bundle = lhs.ranks[bundle_i];
         if (!current_bundle.empty())
         {
-            for (size_t row_i{0}; row_i < current_bundle.size(); ++row_i)
+            for (std::size_t row_i{0}; row_i < current_bundle.size(); ++row_i)
             {
                 for (int j{0}; j < lhs.format.inputs_count; ++j)
                 {
@@ -78,7 +78,7 @@ std::ostream &operator<<(std::ostream &out, const qmck::logic_table &lhs)
     out << "qmck::logic_table{\n";
     out << "generic_table_format=" << lhs.format << ",\n\n";
 
-    for (size_t i = 0; i < lhs.rows.size(); ++i)
+    for (std::size_t i = 0; i < lhs.rows.size(); ++i)
     {
         for (int j{0}; j < lhs.format.inputs_count; ++j)
         {

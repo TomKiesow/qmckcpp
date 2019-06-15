@@ -3,6 +3,7 @@
 #include <qmck/generic_table_format.hpp>
 #include <qmck/quine_row.hpp>
 #include <qmck/logic_table.hpp>
+
 #include <array>
 #include <vector>
 

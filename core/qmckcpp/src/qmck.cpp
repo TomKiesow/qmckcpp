@@ -19,19 +19,19 @@ namespace qmck
         auto ranks_size = quine_table_current.ranks.size();
         while (!quine_table_current.empty())
         {
-            for (size_t i{0}; i < ranks_size; ++i)
+            for (std::size_t i{0}; i < ranks_size; ++i)
             {
                 auto &next_bundle = quine_table_next.ranks[i];
                 auto &lower_bundle = quine_table_current.ranks[i];
                 auto &upper_bundle = quine_table_current.ranks[i + 1];
 
                 auto lower_n = lower_bundle.size();
-                for (size_t lower_i{0}; lower_i < lower_n; ++lower_i)
+                for (std::size_t lower_i{0}; lower_i < lower_n; ++lower_i)
                 {
                     auto &lower_row = lower_bundle[lower_i];
 
                     auto upper_n = upper_bundle.size();
-                    for (size_t upper_i{0}; upper_i < upper_n; ++upper_i)
+                    for (std::size_t upper_i{0}; upper_i < upper_n; ++upper_i)
                     {
                         auto &upper_row = upper_bundle[upper_i];
 
