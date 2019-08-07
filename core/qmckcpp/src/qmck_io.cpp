@@ -12,12 +12,12 @@ std::ostream &operator<<(std::ostream &out, const qmck::quine_table &lhs)
     out << "generic_table_format=" << lhs.format << ",\n\n";
     out << "----------------\n";
 
-    for (size_t bundle_i{0}; bundle_i < lhs.ranks.size(); ++bundle_i)
+    for (std::size_t bundle_i{0}; bundle_i < lhs.ranks.size(); ++bundle_i)
     {
         auto const &current_bundle = lhs.ranks[bundle_i];
         if (!current_bundle.empty())
         {
-            for (size_t row_i{0}; row_i < current_bundle.size(); ++row_i)
+            for (std::size_t row_i{0}; row_i < current_bundle.size(); ++row_i)
             {
                 for (std::uint32_t j{0}; j < lhs.format.inputs_count; ++j)
                 {
@@ -78,7 +78,7 @@ std::ostream &operator<<(std::ostream &out, const qmck::logic_table &lhs)
     out << "qmck::logic_table{\n";
     out << "generic_table_format=" << lhs.format << ",\n\n";
 
-    for (size_t i = 0; i < lhs.rows.size(); ++i)
+    for (std::size_t i = 0; i < lhs.rows.size(); ++i)
     {
         for (std::uint32_t j{0}; j < lhs.format.inputs_count; ++j)
         {
@@ -157,7 +157,7 @@ std::ostream &operator<<(std::ostream &out, qmck::tree::rootnode &root)
 {
     // loop until -1 and print last child seperately so there are no trailing operation signs
     auto &children = root.get_children();
-    for (size_t child_i{0}; child_i < children.size() - 1; ++child_i)
+    for (std::size_t child_i{0}; child_i < children.size() - 1; ++child_i)
     {
         auto &child = children[child_i];
         if (child->get_children().empty())
@@ -192,7 +192,7 @@ std::ostream &recursive_tree_cout(std::ostream &out, qmck::tree::treenode *lhs, 
     std::string operation = depth % 2 == 1 ? "+" : "*";
     // loop until -1 and print last child seperately so there are no trailing operation signs
     auto &children = lhs->get_children();
-    for (size_t child_i{0}; child_i < children.size() - 1; ++child_i)
+    for (std::size_t child_i{0}; child_i < children.size() - 1; ++child_i)
     {
         auto &child = children[child_i];
         if (child->get_children().empty())

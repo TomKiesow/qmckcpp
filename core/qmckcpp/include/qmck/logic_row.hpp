@@ -1,7 +1,6 @@
 #pragma once
 
 #include <qmck/logic_value.hpp>
-#include <qmck/generic_table_format.hpp>
 
 namespace qmck
 {

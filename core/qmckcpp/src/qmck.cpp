@@ -16,19 +16,19 @@ namespace qmck
         auto ranks_size = quine_table_current.ranks.size();
         while (!quine_table_current.empty())
         {
-            for (size_t i{0}; i < ranks_size; ++i)
+            for (std::size_t i{0}; i < ranks_size; ++i)
             {
                 auto &next_bundle = quine_table_next.ranks[i];
                 auto &lower_bundle = quine_table_current.ranks[i];
                 auto &upper_bundle = quine_table_current.ranks[i + 1];
 
                 auto lower_n = lower_bundle.size();
-                for (size_t lower_i{0}; lower_i < lower_n; ++lower_i)
+                for (std::size_t lower_i{0}; lower_i < lower_n; ++lower_i)
                 {
                     auto &lower_row = lower_bundle[lower_i];
 
                     auto upper_n = upper_bundle.size();
-                    for (size_t upper_i{0}; upper_i < upper_n; ++upper_i)
+                    for (std::size_t upper_i{0}; upper_i < upper_n; ++upper_i)
                     {
                         auto &upper_row = upper_bundle[upper_i];
 
@@ -53,11 +53,11 @@ namespace qmck
 
             // go through each row in quine_table_current
             // and add it to all_prime_rows in case it is not completely covered
-            for (size_t rank_i{0}; rank_i < ranks_size; ++rank_i)
+            for (std::size_t rank_i{0}; rank_i < ranks_size; ++rank_i)
             {
                 auto &rank = quine_table_current.ranks[rank_i];
 
-                for (size_t j{0}; j < rank.size(); ++j)
+                for (std::size_t j{0}; j < rank.size(); ++j)
                 {
                     if ((rank[j].outputs & rank[j].outputs_done_mask) != rank[j].outputs)
                     {
@@ -72,16 +72,16 @@ namespace qmck
 
 
         // go through all_prime_rows and remove duplicates
-        for (size_t rank_i{0}; rank_i < ranks_size; ++rank_i)
+        for (std::size_t rank_i{0}; rank_i < ranks_size; ++rank_i)
         {
             auto &rank = all_prime_rows.ranks[rank_i];
 
-            for (size_t row_i_upper{0}; row_i_upper < rank.size(); ++row_i_upper)
+            for (std::size_t row_i_upper{0}; row_i_upper < rank.size(); ++row_i_upper)
             {
                 auto &upper_inputs = rank[row_i_upper].inputs;
                 auto &upper_inputs_deduced_masks = rank[row_i_upper].inputs_deduced_mask;
 
-                for (size_t row_i_lower{0}; row_i_lower < rank.size(); ++row_i_lower)
+                for (std::size_t row_i_lower{0}; row_i_lower < rank.size(); ++row_i_lower)
                 {
                     if (row_i_lower != row_i_upper)
                     {

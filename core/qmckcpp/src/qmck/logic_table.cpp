@@ -79,8 +79,8 @@ namespace
             }
             case symbol::DONT_CARE:
             {
-                size_t row_count = rows.size();
-                for (size_t row_idx{0u}; row_idx < row_count; ++row_idx)
+                std::size_t row_count = rows.size();
+                for (std::size_t row_idx{0u}; row_idx < row_count; ++row_idx)
                 {
                     rows[row_idx].inputs <<= 1u;
 
@@ -114,8 +114,8 @@ namespace
             {
             case symbol::HIGH:
             {
-                size_t row_count = rows.size();
-                for (size_t row_idx{0}; row_idx < row_count; ++row_idx)
+                std::size_t row_count = rows.size();
+                for (std::size_t row_idx{0}; row_idx < row_count; ++row_idx)
                 {
                     rows[row_idx].outputs <<= 1u;
                     rows[row_idx].outputs |= qmck::logic_value{1u};
@@ -127,8 +127,8 @@ namespace
             }
             case symbol::LOW:
             {
-                size_t row_count = rows.size();
-                for (size_t row_idx{0}; row_idx < row_count; ++row_idx)
+                std::size_t row_count = rows.size();
+                for (std::size_t row_idx{0}; row_idx < row_count; ++row_idx)
                 {
                     rows[row_idx].outputs <<= 1u;
                     rows[row_idx].outputs_dc_mask <<= 1u;
@@ -138,8 +138,8 @@ namespace
             }
             case symbol::DONT_CARE:
             {
-                size_t row_count = rows.size();
-                for (size_t row_idx{0}; row_idx < row_count; ++row_idx)
+                std::size_t row_count = rows.size();
+                for (std::size_t row_idx{0}; row_idx < row_count; ++row_idx)
                 {
                     rows[row_idx].outputs <<= 1u;
                     rows[row_idx].outputs |= qmck::logic_value{1u};

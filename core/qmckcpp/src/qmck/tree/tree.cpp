@@ -5,7 +5,7 @@
 qmck::tree::rootnode qmck::tree::build_tree(const qmck::result_table &result, int result_col)
 {
     tree::rootnode rootnode{};
-    for (size_t i{0}; i < (1u << result.format.inputs_count); i++)
+    for (std::size_t i{0}; i < (1u << result.format.inputs_count); i++)
     {
         auto child = std::make_unique<treenode>(rootnode, 0);
         rootnode.add_child(std::move(child)); // rootnode manages memory!
@@ -32,7 +32,7 @@ qmck::tree::rootnode qmck::tree::build_tree(const qmck::result_table &result, in
     }
 
     auto &roots_children = rootnode.get_children();
-    for (size_t child_i{0}; child_i < roots_children.size(); ++child_i)
+    for (std::size_t child_i{0}; child_i < roots_children.size(); ++child_i)
     {
         auto &child = roots_children[child_i];
 
@@ -62,7 +62,7 @@ bool qmck::tree::remove_unneeded_braces_recursive(rootnode &parent, treenode *cu
     }
     else if (children.size() > 1)
     {
-        for (size_t child_i{0}; child_i < children.size(); ++child_i)
+        for (std::size_t child_i{0}; child_i < children.size(); ++child_i)
         {
             auto &child = children[child_i];
 
@@ -92,7 +92,7 @@ bool qmck::tree::remove_unneeded_braces_recursive(treenode *parent, treenode *cu
     }
     else if (children.size() > 1)
     {
-        for (size_t child_i{0}; child_i < children.size(); ++child_i)
+        for (std::size_t child_i{0}; child_i < children.size(); ++child_i)
         {
             auto &child = children[child_i];
 
@@ -110,7 +110,7 @@ void qmck::tree::remove_unneeded_braces(qmck::tree::rootnode &rootnode)
 {
     auto &children = rootnode.children;
 
-    for (size_t child_i{0}; child_i < children.size(); ++child_i)
+    for (std::size_t child_i{0}; child_i < children.size(); ++child_i)
     {
         auto &child = children[child_i];
 
