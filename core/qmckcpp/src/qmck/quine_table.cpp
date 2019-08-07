@@ -1,5 +1,4 @@
 #include <qmck/quine_table.hpp>
-#include <iostream>
 
 qmck::quine_table::quine_table(qmck::logic_table &&lhs)
 {

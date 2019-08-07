@@ -1,13 +1,10 @@
 #include <qmck.hpp>
 
-#include <iostream>
-#include <vector>
 #include <list>
-#include <iterator>
 
 namespace qmck
 {
-    qmck::quine_table deduce(qmck::logic_table &table)
+    qmck::result_table deduce(qmck::logic_table &table)
     {
         quine_table quine_table_orig{table};
 
@@ -56,11 +53,11 @@ namespace qmck
 
             // go through each row in quine_table_current
             // and add it to all_prime_rows in case it is not completely covered
-            for (int rank_i = 0; rank_i < ranks_size; ++rank_i)
+            for (size_t rank_i{0}; rank_i < ranks_size; ++rank_i)
             {
                 auto &rank = quine_table_current.ranks[rank_i];
 
-                for (int j = 0; j < rank.size(); ++j)
+                for (size_t j{0}; j < rank.size(); ++j)
                 {
                     if ((rank[j].outputs & rank[j].outputs_done_mask) != rank[j].outputs)
                     {
@@ -75,16 +72,16 @@ namespace qmck
 
 
         // go through all_prime_rows and remove duplicates
-        for (int rank_i = 0; rank_i < ranks_size; ++rank_i)
+        for (size_t rank_i{0}; rank_i < ranks_size; ++rank_i)
         {
             auto &rank = all_prime_rows.ranks[rank_i];
 
-            for (int row_i_upper = 0; row_i_upper < rank.size(); ++row_i_upper)
+            for (size_t row_i_upper{0}; row_i_upper < rank.size(); ++row_i_upper)
             {
                 auto &upper_inputs = rank[row_i_upper].inputs;
                 auto &upper_inputs_deduced_masks = rank[row_i_upper].inputs_deduced_mask;
 
-                for (int row_i_lower = 0; row_i_lower < rank.size(); ++row_i_lower)
+                for (size_t row_i_lower{0}; row_i_lower < rank.size(); ++row_i_lower)
                 {
                     if (row_i_lower != row_i_upper)
                     {
@@ -101,6 +98,6 @@ namespace qmck
             }
         }
 
-        return all_prime_rows;
+        return result_table(all_prime_rows);
     }
 }

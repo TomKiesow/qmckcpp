@@ -25,6 +25,6 @@ namespace qmck
         explicit quine_row(logic_row &&lrow) noexcept;
 
     public:
-        std::vector<logic_value> calculate_indices() const;
+        std::vector<logic_value> calculate_minterms_covered() const;
     };
 }

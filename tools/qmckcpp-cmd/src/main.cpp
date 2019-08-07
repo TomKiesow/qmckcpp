@@ -1,7 +1,9 @@
 #include <qmck.hpp>
+#include <qmck/tree/tree.hpp>
 
 #include <fstream>
 #include <iostream>
+#include <memory>
 
 using namespace qmck;
 
@@ -22,8 +24,16 @@ int main(int const argc, char const **argv)
     table.sort();
     std::cout << table << '\n';
 
-    auto deduced = qmck::deduce(table);
-    std::cout << deduced << '\n';
+    auto result = qmck::deduce(table);
+    std::cout << result << "\n\n";
+
+    auto rootnode = qmck::tree::build_tree(result, 0);
+
+    std::cout << rootnode << "\n";
+
+    qmck::tree::remove_unneeded_braces(rootnode);
+
+    std::cout << rootnode << "\n";
 
     return 0;
 }

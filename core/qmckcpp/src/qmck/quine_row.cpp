@@ -14,7 +14,7 @@ qmck::quine_row::quine_row(const qmck::logic_row &lrow)
     this->outputs_dc_mask = lrow.outputs_dc_mask;
 }
 
-std::vector<qmck::logic_value> qmck::quine_row::calculate_indices() const
+std::vector<qmck::logic_value> qmck::quine_row::calculate_minterms_covered() const
 {
     std::vector<qmck::logic_value> result{};
     result.push_back(inputs & ~inputs_deduced_mask); // value with all deduced bits as 0
