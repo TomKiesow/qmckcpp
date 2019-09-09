@@ -20,20 +20,36 @@ int main(int const argc, char const **argv)
     char const *begin = table_str.c_str();
     char const *end = table_str.c_str() + table_str.size();
 
-    auto table = qmck::parse_logic_table(begin, end);
+    auto table = parse_logic_table(begin, end);
     table.sort();
     std::cout << table << '\n';
 
-    auto result = qmck::deduce(table);
+    auto result = deduce(table);
     std::cout << result << "\n\n";
 
-    auto rootnode = qmck::tree::build_tree(result, 0);
+    auto tree = tree::build_tree(result, 0);
 
-    std::cout << rootnode << "\n";
+//    tree::remove_unneeded_braces(tree);
 
-    qmck::tree::remove_unneeded_braces(rootnode);
+    std::cout << tree << "\n";
 
-    std::cout << rootnode << "\n";
+//    for (int i = 0; i < 6; ++i)
+//    {
+//        auto res = tree::multiply_nodes(&rootnode, rootnode.children[0], rootnode.children[1]);
+//
+//        auto child1 = rootnode.children[0];
+//        auto child2 = rootnode.children[1];
+//
+//        rootnode.disconnect_child(child1);
+//        rootnode.disconnect_child(child2);
+//
+//        rootnode.remove_node(child1);
+//        rootnode.remove_node(child2);
+//
+//        rootnode.connect_child(res);
+//
+//        std::cout << rootnode << "\n";
+//    }
 
     return 0;
 }

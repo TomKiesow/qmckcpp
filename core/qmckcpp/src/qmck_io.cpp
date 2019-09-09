@@ -153,69 +153,101 @@ std::ostream &operator<<(std::ostream &out, const qmck::result_table &lhs)
     return out;
 }
 
-std::ostream &operator<<(std::ostream &out, qmck::tree::rootnode &root)
+std::ostream &operator<<(std::ostream &out, qmck::tree::tree &tree)
 {
     // loop until -1 and print last child seperately so there are no trailing operation signs
-    auto &children = root.get_children();
+    auto &children = tree.rootnode->children;
     for (std::size_t child_i{0}; child_i < children.size() - 1; ++child_i)
     {
         auto &child = children[child_i];
-        if (child->get_children().empty())
+        if (child->children.empty())
         {
+            if (child->negated)
+            {
+                out << '~';
+            }
             out << child->operand << " * ";
         }
         else
         {
+            if (child->negated)
+            {
+                out << '~';
+            }
             out << "(";
-            recursive_tree_cout(out, child, 1);
+            recursive_tree_cout(out, child);
             out << ") * ";
         }
     }
 
     auto &child = children[children.size() - 1];
-    if (child->get_children().empty())
+    if (child->children.empty())
     {
+        if (child->negated)
+        {
+            out << '~';
+        }
         out << child->operand;
     }
     else
     {
+        if (child->negated)
+        {
+            out << '~';
+        }
         out << "(";
-        recursive_tree_cout(out, child, 1);
+        recursive_tree_cout(out, child);
         out << ")";
     }
 
     return out;
 }
 
-std::ostream &recursive_tree_cout(std::ostream &out, qmck::tree::treenode *lhs, int depth)
+std::ostream &recursive_tree_cout(std::ostream &out, qmck::tree::node *lhs)
 {
-    std::string operation = depth % 2 == 1 ? "+" : "*";
+    std::string operation = lhs->operation ? "*" : "+";
     // loop until -1 and print last child seperately so there are no trailing operation signs
-    auto &children = lhs->get_children();
+    auto &children = lhs->children;
     for (std::size_t child_i{0}; child_i < children.size() - 1; ++child_i)
     {
         auto &child = children[child_i];
-        if (child->get_children().empty())
+        if (child->children.empty())
         {
+            if (child->negated)
+            {
+                out << '~';
+            }
             out << child->operand << operation;
         }
         else
         {
+            if (child->negated)
+            {
+                out << '~';
+            }
             out << "(";
-            recursive_tree_cout(out, child, depth + 1);
+            recursive_tree_cout(out, child);
             out << ")" << operation;
         }
     }
 
     auto &child = children[children.size() - 1];
-    if (child->get_children().empty())
+    if (child->children.empty())
     {
+        if (child->negated)
+        {
+            out << '~';
+        }
         out << child->operand;
     }
     else
     {
+        if (child->negated)
+        {
+            out << '~';
+        }
         out << "(";
-        recursive_tree_cout(out, child, depth + 1);
+        recursive_tree_cout(out, child);
         out << ")";
     }
 
