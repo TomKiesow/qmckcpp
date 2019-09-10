@@ -27,18 +27,8 @@ namespace qmck::tree
         ~tree() = default;
 
     public:
-        node *create_node(qmck::logic_value operand, bool operation);
+        node *create_node(node *parent, qmck::logic_value operand, bool operation);
 
         void destroy_node(node *);
     };
-
-    // perhaps move these functions somewhere else?
-    tree build_tree(const qmck::result_table &table, int result_col);
-
-    // removes braces around single operands
-    void remove_unneeded_braces(tree &tree);
-
-    int calc_depth(node *node);
-
-    //    basic_node *multiply_nodes(root_node *root, basic_node *node1, basic_node *node2);
 }

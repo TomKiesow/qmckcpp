@@ -1,5 +1,5 @@
 #include <qmck.hpp>
-#include <qmck/tree/tree.hpp>
+#include <qmck/tree/tree_utils.hpp>
 
 #include <fstream>
 #include <iostream>
@@ -27,9 +27,9 @@ int main(int const argc, char const **argv)
     auto result = deduce(table);
     std::cout << result << "\n\n";
 
-    auto tree = tree::build_tree(result, 0);
+    auto tree = tree::utils::build_tree(result, 0);
 
-//    tree::remove_unneeded_braces(tree);
+    tree::utils::remove_unneeded_braces(tree);
 
     std::cout << tree << "\n";
 
@@ -53,3 +53,4 @@ int main(int const argc, char const **argv)
 
     return 0;
 }
+

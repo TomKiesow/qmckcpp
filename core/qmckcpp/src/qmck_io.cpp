@@ -157,9 +157,9 @@ std::ostream &operator<<(std::ostream &out, qmck::tree::tree &tree)
 {
     // loop until -1 and print last child seperately so there are no trailing operation signs
     auto &children = tree.rootnode->children;
-    for (std::size_t child_i{0}; child_i < children.size() - 1; ++child_i)
+    for (std::size_t child_i{0}; child_i + 1 < children.size(); ++child_i)
     {
-        auto &child = children[child_i];
+        auto child = children[child_i];
         if (child->children.empty())
         {
             if (child->negated)
@@ -180,24 +180,27 @@ std::ostream &operator<<(std::ostream &out, qmck::tree::tree &tree)
         }
     }
 
-    auto &child = children[children.size() - 1];
-    if (child->children.empty())
+    if (!children.empty())
     {
-        if (child->negated)
+        auto child = children[children.size() - 1];
+        if (child->children.empty())
         {
-            out << '~';
+            if (child->negated)
+            {
+                out << '~';
+            }
+            out << child->operand;
         }
-        out << child->operand;
-    }
-    else
-    {
-        if (child->negated)
+        else
         {
-            out << '~';
+            if (child->negated)
+            {
+                out << '~';
+            }
+            out << "(";
+            recursive_tree_cout(out, child);
+            out << ")";
         }
-        out << "(";
-        recursive_tree_cout(out, child);
-        out << ")";
     }
 
     return out;
@@ -208,7 +211,7 @@ std::ostream &recursive_tree_cout(std::ostream &out, qmck::tree::node *lhs)
     std::string operation = lhs->operation ? "*" : "+";
     // loop until -1 and print last child seperately so there are no trailing operation signs
     auto &children = lhs->children;
-    for (std::size_t child_i{0}; child_i < children.size() - 1; ++child_i)
+    for (std::size_t child_i{0}; child_i + 1 < children.size(); ++child_i)
     {
         auto &child = children[child_i];
         if (child->children.empty())
@@ -231,24 +234,27 @@ std::ostream &recursive_tree_cout(std::ostream &out, qmck::tree::node *lhs)
         }
     }
 
-    auto &child = children[children.size() - 1];
-    if (child->children.empty())
+    if (!children.empty())
     {
-        if (child->negated)
+        auto &child = children[children.size() - 1];
+        if (child->children.empty())
         {
-            out << '~';
+            if (child->negated)
+            {
+                out << '~';
+            }
+            out << child->operand;
         }
-        out << child->operand;
-    }
-    else
-    {
-        if (child->negated)
+        else
         {
-            out << '~';
+            if (child->negated)
+            {
+                out << '~';
+            }
+            out << "(";
+            recursive_tree_cout(out, child);
+            out << ")";
         }
-        out << "(";
-        recursive_tree_cout(out, child);
-        out << ")";
     }
 
     return out;
