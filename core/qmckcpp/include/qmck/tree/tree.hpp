@@ -30,5 +30,7 @@ namespace qmck::tree
         node *create_node(node *parent, qmck::logic_value operand, bool operation);
 
         void destroy_node(node *);
+
+        void destroy_subtree(node *);
     };
 }

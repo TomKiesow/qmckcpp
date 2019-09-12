@@ -31,25 +31,17 @@ int main(int const argc, char const **argv)
 
     tree::utils::remove_unneeded_braces(tree);
 
-    std::cout << tree << "\n";
+    for (int i = 0; i < 6; i++)
+    {
+        std::cout << tree << "\n";
+        tree::utils::multiply_nodes(tree, tree.rootnode, tree.rootnode->children[0], tree.rootnode->children[1]);
+        tree::utils::remove_unneeded_braces(tree);
+        qmck::tree::utils::simplify_idempotency(tree);
+        tree::utils::remove_unneeded_braces(tree);
+        std::cout << tree << "\n\n";
+    }
 
-//    for (int i = 0; i < 6; ++i)
-//    {
-//        auto res = tree::multiply_nodes(&rootnode, rootnode.children[0], rootnode.children[1]);
-//
-//        auto child1 = rootnode.children[0];
-//        auto child2 = rootnode.children[1];
-//
-//        rootnode.disconnect_child(child1);
-//        rootnode.disconnect_child(child2);
-//
-//        rootnode.remove_node(child1);
-//        rootnode.remove_node(child2);
-//
-//        rootnode.connect_child(res);
-//
-//        std::cout << rootnode << "\n";
-//    }
+    std::cout << tree << "\n\n";
 
     return 0;
 }

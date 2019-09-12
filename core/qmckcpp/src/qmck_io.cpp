@@ -209,7 +209,7 @@ std::ostream &operator<<(std::ostream &out, qmck::tree::tree &tree)
 std::ostream &recursive_tree_cout(std::ostream &out, qmck::tree::node *lhs)
 {
     std::string operation = lhs->operation ? "*" : "+";
-    // loop until -1 and print last child seperately so there are no trailing operation signs
+    // loop until -1 and print last child separately so there are no trailing operation signs
     auto &children = lhs->children;
     for (std::size_t child_i{0}; child_i + 1 < children.size(); ++child_i)
     {

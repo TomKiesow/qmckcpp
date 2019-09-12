@@ -30,3 +30,11 @@ void qmck::tree::tree::destroy_node(qmck::tree::node *target)
         return node.get() == target;
     }), all_nodes.end());
 }
+
+void qmck::tree::tree::destroy_subtree(qmck::tree::node *subtree)
+{
+    for(auto child:subtree->children){
+        destroy_subtree(child);
+    }
+    destroy_node(subtree);
+}

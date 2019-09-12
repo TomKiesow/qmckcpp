@@ -75,37 +75,6 @@ int qmck::tree::utils::calc_depth(node *node)
     return max;
 }
 
-qmck::tree::node *qmck::tree::utils::multiply_nodes(tree &tree, node *parent, node *child1, node *child2)
-{
-    auto result_parent_ptr = tree.create_node(nullptr, 0, parent->operation);
-
-    //    for (auto &n1 : child1->children)
-    //    {
-    //        for (auto &n2 : child2->children)
-    //        {
-    //            auto result_parent1_unique_ptr = std::make_unique<internal_node>(*root, 0);
-    //            auto result_parent_ptr1 = result_parent1_unique_ptr.get();
-    //
-    //            result_parent_ptr->connect_child(result_parent_ptr1);
-    //            result_parent_ptr->add_node(std::move(result_parent1_unique_ptr));
-    //
-    //            auto result1 = std::make_unique<internal_node>(*root, 0);
-    //            auto result2 = std::make_unique<internal_node>(*root, 0);
-    //
-    //            result1->operand = n1->operand;
-    //            result2->operand = n2->operand;
-    //
-    //            result_parent_ptr1->connect_child(result1.get());
-    //            result_parent_ptr1->connect_child(result2.get());
-    //
-    //            root->add_node(std::move(result1));
-    //            root->add_node(std::move(result2));
-    //        }
-    //    }
-
-    return result_parent_ptr;
-}
-
 std::vector<qmck::tree::node *> get_siblings_of(qmck::tree::node *node)
 {
     std::vector<qmck::tree::node *> all_children = node->parent->children;
@@ -162,4 +131,120 @@ void qmck::tree::utils::remove_unneeded_braces_recursion(qmck::tree::tree &tree,
             }
         }
     }
+}
+
+void qmck::tree::utils::simplify_idempotency(qmck::tree::tree &tree)
+{
+    auto &all_nodes = tree.all_nodes;
+    for (std::size_t all_nodes_i{0}; all_nodes_i < all_nodes.size(); ++all_nodes_i)
+    {
+        auto current_node = all_nodes[all_nodes_i].get();
+        auto &children = current_node->children;
+        for (std::size_t child_i1{0}; child_i1 < children.size(); ++child_i1)
+        {
+            auto child1 = children[child_i1];
+            if (child1->is_leaf())
+            {
+                for (std::size_t child_i2{child_i1 + 1}; child_i2 < children.size(); ++child_i2)
+                {
+                    auto child2 = children[child_i2];
+                    // if nodes share operand we ca remove one of them
+                    if(child2->is_leaf() && child1->operand == child2->operand && child1->negated == child2->negated){
+                        current_node->remove_child(child2);
+                        --child_i2; // compensate for removed child
+                        tree.destroy_node(child2);
+                    }
+                }
+            }
+        }
+    }
+}
+
+qmck::tree::node *qmck::tree::utils::duplicate_subtree(qmck::tree::tree &tree, qmck::tree::node *orig)
+{
+    qmck::tree::node *copy = tree.create_node(nullptr, orig->operand, orig->operation);
+
+    for (auto child : orig->children)
+    {
+        auto child_copy = duplicate_subtree(tree, child);
+
+        child_copy->parent = copy;
+        copy->children.push_back(child_copy);
+    }
+
+    return copy;
+}
+
+qmck::tree::node *qmck::tree::utils::multiply_nodes(qmck::tree::tree &tree, qmck::tree::node *parent_of_both, qmck::tree::node *node1, qmck::tree::node *node2)
+{
+    auto result = tree.create_node(nullptr, 0, parent_of_both->operation);
+
+    // if one of the two nodes is a leaf node
+    if (node1->is_leaf() != node2->is_leaf())
+    {
+        node *leaf = node1->is_leaf() ? node1 : node2;
+        node *subtree = node1->is_leaf() ? node2 : node1;
+
+        for (std::size_t child_i{0}; child_i < subtree->children.size(); ++child_i)
+        {
+            auto child = subtree->children[child_i];
+
+            auto new_node = tree.create_node(result, 0, result->operation);
+            result->children.push_back(new_node);
+
+            subtree->remove_child(child);
+            --child_i; // compensate for removed child
+
+            child->parent = new_node;
+            new_node->children.push_back(child);
+
+            auto leaf_copy = tree.create_node(new_node, leaf->operand, leaf->operation); // operation actually irrelevant
+            new_node->children.push_back(leaf_copy);
+        }
+        parent_of_both->remove_child(leaf);
+        parent_of_both->remove_child(subtree);
+
+        tree.destroy_node(leaf);
+        tree.destroy_node(subtree);
+
+        result->operation = subtree->operation;
+
+        result->parent = parent_of_both;
+        parent_of_both->children.push_back(result);
+    }
+
+        // both nodes are subtrees
+    else
+    {
+        for (auto child1 : node1->children)
+        {
+            for (auto child2: node2->children)
+            {
+                auto new_node = tree.create_node(result, 0, result->operation);
+                result->children.push_back(new_node);
+
+                auto child1_copy = duplicate_subtree(tree, child1);
+                auto child2_copy = duplicate_subtree(tree, child2);
+
+                child1_copy->parent = new_node;
+                child2_copy->parent = new_node;
+
+                new_node->children.push_back(child1_copy);
+                new_node->children.push_back(child2_copy);
+            }
+        }
+
+        parent_of_both->remove_child(node1);
+        parent_of_both->remove_child(node2);
+
+        tree.destroy_subtree(node1);
+        tree.destroy_subtree(node2);
+
+        result->operation = node1->operation; // or node2->operation
+
+        result->parent = parent_of_both;
+        parent_of_both->children.push_back(result);
+    }
+
+    return result;
 }
