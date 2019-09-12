@@ -29,20 +29,23 @@ int main(int const argc, char const **argv)
 
     auto tree = tree::utils::build_tree(result, 0);
 
-    tree::utils::remove_unneeded_braces(tree);
+    std::cout << tree << "\n";
 
-    for (int i = 0; i < 6; i++)
+    tree::utils::remove_unneeded_braces(tree);
+    tree::utils::simplify_absorption(tree);
+
+    std::cout << tree << "\n";
+
+    while ((tree::utils::calc_depth(tree.rootnode) > 1 || tree.rootnode->operation != tree::OPERATION_OR) && tree.rootnode->children.size() >= 2)
     {
-        std::cout << tree << "\n";
         tree::utils::multiply_nodes(tree, tree.rootnode, tree.rootnode->children[0], tree.rootnode->children[1]);
         tree::utils::remove_unneeded_braces(tree);
-        qmck::tree::utils::simplify_idempotency(tree);
+        tree::utils::simplify_idempotency(tree);
         tree::utils::remove_unneeded_braces(tree);
-        std::cout << tree << "\n\n";
+        tree::utils::simplify_absorption(tree);
+        tree::utils::remove_unneeded_braces(tree);
+        std::cout << tree << "\n";
     }
-
-    std::cout << tree << "\n\n";
 
     return 0;
 }
-

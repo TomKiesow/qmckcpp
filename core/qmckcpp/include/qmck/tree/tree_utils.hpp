@@ -8,9 +8,9 @@ namespace qmck::tree::utils
 {
     qmck::tree::tree build_tree(const qmck::result_table &table, int result_col);
 
-    int calc_depth(node *node);
+    bool node_comparator(const node* a, const node* b);
 
-    std::vector<node *> get_siblings_of(node *node);
+    int calc_depth(node *node);
 
     void remove_unneeded_braces(tree &tree);
 
@@ -18,6 +18,10 @@ namespace qmck::tree::utils
     void remove_unneeded_braces_recursion(tree &tree, node *current);
 
     void simplify_idempotency(tree &tree);
+
+    void simplify_absorption(tree &tree);
+
+    bool simplify_absorption(tree &tree, node* current);
 
     node *duplicate_subtree(tree &tree, node *subtree);
 
