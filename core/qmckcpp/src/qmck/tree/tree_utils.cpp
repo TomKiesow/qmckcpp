@@ -103,7 +103,7 @@ void qmck::tree::utils::remove_unneeded_braces_recursion(tree &tree, node *curre
     // remove child and connect its children to self
     while (children.size() == 1)
     {
-        auto &child = children[0];
+        auto child = children[0];
         for (auto childs_child : child->children)
         {
             childs_child->parent = current;
@@ -268,10 +268,10 @@ qmck::tree::node *qmck::tree::utils::multiply_nodes(tree &tree, node *parent_of_
         parent_of_both->remove_child(leaf);
         parent_of_both->remove_child(subtree);
 
+        result->operation = subtree->operation;
+
         tree.destroy_node(leaf);
         tree.destroy_node(subtree);
-
-        result->operation = subtree->operation;
 
         result->parent = parent_of_both;
         parent_of_both->children.push_back(result);
@@ -301,10 +301,10 @@ qmck::tree::node *qmck::tree::utils::multiply_nodes(tree &tree, node *parent_of_
         parent_of_both->remove_child(node1);
         parent_of_both->remove_child(node2);
 
+        result->operation = node1->operation; // or node2->operation
+
         tree.destroy_subtree(node1);
         tree.destroy_subtree(node2);
-
-        result->operation = node1->operation; // or node2->operation
 
         result->parent = parent_of_both;
         parent_of_both->children.push_back(result);
