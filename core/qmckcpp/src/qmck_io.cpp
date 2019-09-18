@@ -27,20 +27,20 @@ std::ostream &operator<<(std::ostream &out, const qmck::quine_table &lhs)
                     }
                     else
                     {
-                        out << ((current_bundle[row_i].inputs >> (lhs.format.inputs_count - j - 1)) & 1u) ? '1' : '0';
+                        out << (((current_bundle[row_i].inputs >> (lhs.format.inputs_count - j - 1)) & 1u) ? '1' : '0');
                     }
                 }
                 out << " | ";
 
                 for (std::uint32_t k{0}; k < lhs.format.outputs_count; ++k)
                 {
-                    out << ((current_bundle[row_i].outputs >> (lhs.format.outputs_count - k - 1)) & 1u) ? '1' : '0';
+                    out << (((current_bundle[row_i].outputs >> (lhs.format.outputs_count - k - 1)) & 1u) ? '1' : '0');
                 }
                 out << "  ";
 
                 for (std::uint32_t l{0}; l < lhs.format.outputs_count; ++l)
                 {
-                    out << ((current_bundle[row_i].outputs_done_mask >> (lhs.format.outputs_count - l - 1)) & 1u) ? '1' : '0';
+                    out << (((current_bundle[row_i].outputs_done_mask >> (lhs.format.outputs_count - l - 1)) & 1u) ? '1' : '0');
                 }
 
                 if ((current_bundle[row_i].outputs_done_mask & current_bundle[row_i].outputs) == current_bundle[row_i].outputs)
@@ -82,19 +82,19 @@ std::ostream &operator<<(std::ostream &out, const qmck::logic_table &lhs)
     {
         for (std::uint32_t j{0}; j < lhs.format.inputs_count; ++j)
         {
-            out << ((lhs.rows[i].inputs >> (lhs.format.inputs_count - j - 1)) & 1u) ? '1' : '0';
+            out << (((lhs.rows[i].inputs >> (lhs.format.inputs_count - j - 1)) & 1u) ? '1' : '0');
         }
         out << " | ";
 
         for (std::uint32_t k{0}; k < lhs.format.outputs_count; ++k)
         {
-            out << ((lhs.rows[i].outputs >> (lhs.format.outputs_count - k - 1)) & 1u) ? '1' : '0';
+            out << (((lhs.rows[i].outputs >> (lhs.format.outputs_count - k - 1)) & 1u) ? '1' : '0');
         }
         out << "  ";
 
         for (std::uint32_t l{0}; l < lhs.format.outputs_count; ++l)
         {
-            out << ((lhs.rows[i].outputs_dc_mask >> (lhs.format.outputs_count - l - 1)) & 1u) ? '1' : '0';
+            out << (((lhs.rows[i].outputs_dc_mask >> (lhs.format.outputs_count - l - 1)) & 1u) ? '1' : '0');
         }
         out << '\n';
     }
@@ -105,7 +105,8 @@ std::ostream &operator<<(std::ostream &out, const qmck::logic_table &lhs)
 
 std::ostream &operator<<(std::ostream &out, const qmck::generic_table_format &lhs)
 {
-    out << "qmck::table_format{inputs_count=" << lhs.inputs_count << ", outputs_count=" << lhs.outputs_count << "}";
+    // + is necessary because uint8_t is typedeffed a uchar and treated as such by ostream
+    out << "qmck::table_format{inputs_count=" << +lhs.inputs_count << ", outputs_count=" << +lhs.outputs_count << "}";
     return out;
 }
 
@@ -129,14 +130,14 @@ std::ostream &operator<<(std::ostream &out, const qmck::result_table &lhs)
             }
             else
             {
-                out << ((quine_row.inputs >> (lhs.format.inputs_count - j - 1)) & 1u) ? '1' : '0';
+                out << (((quine_row.inputs >> (lhs.format.inputs_count - j - 1)) & 1u) ? '1' : '0');
             }
         }
         out << " | ";
 
         for (std::uint32_t k{0}; k < lhs.format.outputs_count; ++k)
         {
-            out << ((quine_row.outputs >> (lhs.format.outputs_count - k - 1)) & 1u) ? '1' : '0';
+            out << (((quine_row.outputs >> (lhs.format.outputs_count - k - 1)) & 1u) ? '1' : '0');
         }
         out << "  ";
 
@@ -153,62 +154,83 @@ std::ostream &operator<<(std::ostream &out, const qmck::result_table &lhs)
     return out;
 }
 
-std::ostream &operator<<(std::ostream &out, qmck::tree::tree &tree)
+std::ostream &operator<<(std::ostream &out, const qmck::tree::tree &tree)
 {
-    return recursive_tree_cout(out, tree.rootnode);
+    return out << tree.rootnode;
 }
 
-std::ostream &recursive_tree_cout(std::ostream &out, qmck::tree::node *lhs)
+std::ostream &operator<<(std::ostream &out, const qmck::tree::node *lhs)
 {
-    std::string operation = lhs->operation ? "*" : "+";
-    // loop until -1 and print last child separately so there are no trailing operation signs
-    auto &children = lhs->children;
-    for (std::size_t child_i{0}; child_i + 1 < children.size(); ++child_i)
+    if (lhs->is_leaf())
     {
-        auto &child = children[child_i];
-        if (child->children.empty())
+        out << +lhs->operand;
+    }
+    else
+    {
+        std::string operation = lhs->operation ? "*" : "+";
+        // loop until -1 and print last child separately so there are no trailing operation signs
+        auto &children = lhs->children;
+        for (std::size_t child_i{0}; child_i + 1 < children.size(); ++child_i)
         {
-            if (child->negated)
+            auto &child = children[child_i];
+            if (child->children.empty())
             {
-                out << '~';
+                if (child->negated)
+                {
+                    out << '~';
+                }
+                out << child->operand << operation;
             }
-            out << child->operand << operation;
+            else
+            {
+                if (child->negated)
+                {
+                    out << '~';
+                }
+                out << "(" << child << ")" << operation;
+            }
         }
-        else
+
+        if (!children.empty())
         {
-            if (child->negated)
+            auto &last_child = children[children.size() - 1];
+            if (last_child->children.empty())
             {
-                out << '~';
+                if (last_child->negated)
+                {
+                    out << '~';
+                }
+                out << last_child->operand;
             }
-            out << "(";
-            recursive_tree_cout(out, child);
-            out << ")" << operation;
+            else
+            {
+                if (last_child->negated)
+                {
+                    out << '~';
+                }
+                out << "(" << last_child << ")";
+            }
         }
     }
-
-    if (!children.empty())
-    {
-        auto &child = children[children.size() - 1];
-        if (child->children.empty())
-        {
-            if (child->negated)
-            {
-                out << '~';
-            }
-            out << child->operand;
-        }
-        else
-        {
-            if (child->negated)
-            {
-                out << '~';
-            }
-            out << "(";
-            recursive_tree_cout(out, child);
-            out << ")";
-        }
-    }
-
     return out;
 }
 
+void print_result_row(std::ostream &out, const qmck::result_row &row, const qmck::generic_table_format &format)
+{
+    char variable{'a'};
+    for (std::uint32_t j{0}; j < format.inputs_count; ++j)
+    {
+        if (!((row.inputs_deduced_mask >> (format.inputs_count - j - 1)) & 1u))
+        {
+            out << variable;
+            if (!((row.inputs >> (format.inputs_count - j - 1)) & 1u))
+            {
+                out << '\'';
+            }
+            out << '*';
+        }
+        ++variable;
+    }
+    // override trailing * with space
+    out << "\b ";
+}

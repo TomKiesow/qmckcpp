@@ -1,6 +1,6 @@
 #include <qmck/result_table.hpp>
 
-qmck::result_table::result_table(qmck::quine_table &lhs)
+qmck::result_table::result_table(const quine_table &lhs)
 {
     this->format = lhs.format;
 
@@ -10,12 +10,12 @@ qmck::result_table::result_table(qmck::quine_table &lhs)
         for(std::size_t row_i{0}; row_i < rank.size(); ++row_i){
             auto &row = rank[row_i];
 
-            add_row(row);
+            add_row(result_row{row, format});
         }
     }
 }
 
-void qmck::result_table::add_row(qmck::quine_row &row)
+void qmck::result_table::add_row(result_row &&row)
 {
     rows[rows.size()] = row;
 }

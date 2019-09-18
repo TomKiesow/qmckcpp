@@ -13,8 +13,8 @@ namespace qmck::tree
     {
     public:
         // default configuration: operand = 0; operation = and
-        node *rootnode;
-        std::vector<std::unique_ptr<node>> all_nodes;
+        node *rootnode{};
+        std::vector<std::unique_ptr<node>> all_nodes{};
 
     public:
         tree();
@@ -27,7 +27,7 @@ namespace qmck::tree
         ~tree() = default;
 
     public:
-        node *create_node(node *parent, qmck::logic_value operand, bool operation);
+        node *create_node(node *parent, logic_value operand, bool operation);
 
         void destroy_node(node *);
 

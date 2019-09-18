@@ -17,17 +17,17 @@ namespace qmck::tree
 
     public:
         tree &context;
-        node *parent;
-        std::vector<node *> children;
-        qmck::logic_value operand;
-        bool negated = false;
-        bool operation;
+        node *parent{};
+        std::vector<node *> children{};
+        logic_value operand{};
+        bool negated{false};
+        bool operation{};
 
     public:
-        node(tree &context, node *parent, qmck::logic_value operand, bool operation);
+        node(tree &context, node *parent, logic_value operand, bool operation);
 
     public:
-        void remove_child(node *);
+        void remove_child(const node *);
 
         bool is_leaf() const;
     };

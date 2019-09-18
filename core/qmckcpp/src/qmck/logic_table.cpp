@@ -4,8 +4,8 @@
 #include <qmck/logic_row.hpp>
 #include <qmck/logic_value.hpp>
 
-#include <bitset>
 #include <regex>
+#include <string>
 
 namespace
 {
@@ -167,13 +167,13 @@ namespace
     }
 }
 
-qmck::logic_table &qmck::logic_table::operator=(qmck::logic_table lhs)
+qmck::logic_table &qmck::logic_table::operator=(logic_table lhs)
 {
     swap(*this, lhs);
     return *this;
 }
 
-void qmck::swap(qmck::logic_table &first, qmck::logic_table &second)
+void qmck::swap(logic_table &first, logic_table &second)
 {
     using std::swap;
     swap(first.format, second.format);
@@ -196,27 +196,4 @@ qmck::logic_table qmck::parse_logic_table(char const *i, char const *n)
     }
 
     return table;
-}
-
-// simple selection-sort
-void qmck::logic_table::sort()
-{
-    int i_border = 0;
-
-    do
-    {
-        int i_min = i_border;
-        for (int i = i_border; i < rows.size(); ++i)
-        {
-            if (rows[i].inputs < rows[i_min].inputs)
-            {
-                i_min = i;
-            }
-        }
-
-        qmck::logic_row tmp = rows[i_border];
-        rows[i_border] = rows[i_min];
-        rows[i_min] = tmp;
-    }
-    while (i_border++ < rows.size());
 }

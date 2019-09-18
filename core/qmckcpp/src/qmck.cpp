@@ -4,7 +4,7 @@
 
 namespace qmck
 {
-    qmck::result_table deduce(qmck::logic_table &table)
+    qmck::result_table deduce(const logic_table &table)
     {
         quine_table quine_table_orig{table};
 

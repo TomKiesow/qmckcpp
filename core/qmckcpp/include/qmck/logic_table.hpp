@@ -3,7 +3,6 @@
 #include <qmck/logic_row.hpp>
 #include <qmck/generic_table_format.hpp>
 
-#include <string>
 #include <vector>
 
 namespace qmck
@@ -12,7 +11,7 @@ namespace qmck
     {
     public:
         generic_table_format format{};
-        std::vector<logic_row> rows;
+        std::vector<logic_row> rows{};
 
     public:
         logic_table() = default;
@@ -20,8 +19,6 @@ namespace qmck
         logic_table(logic_table const &lhs) = default;
 
         logic_table(logic_table &&rhs) noexcept = default;
-
-        void sort();
 
     public:
 

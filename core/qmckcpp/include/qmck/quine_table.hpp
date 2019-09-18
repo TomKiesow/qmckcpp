@@ -19,15 +19,13 @@ namespace qmck
 
         explicit quine_table(logic_table const &lhs);
 
-        explicit quine_table(logic_table &&lhs);
-
         quine_table() = default;
 
         quine_table(quine_table const &lhs) = default;
 
         quine_table(quine_table &&lhs) noexcept = default;
 
-        explicit quine_table(generic_table_format &format);
+        explicit quine_table(const generic_table_format &format);
 
     public:
 

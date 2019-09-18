@@ -14,6 +14,8 @@ std::ostream &operator<<(std::ostream &out, const qmck::generic_table_format &lh
 
 std::ostream &operator<<(std::ostream &out, const qmck::result_table &lhs);
 
-std::ostream &operator<<(std::ostream &out, qmck::tree::tree &lhs);
+std::ostream &operator<<(std::ostream &out, const qmck::tree::tree &lhs);
 
-std::ostream &recursive_tree_cout(std::ostream &out, qmck::tree::node *lhs);
+std::ostream &operator<<(std::ostream &out, const qmck::tree::node *lhs);
+
+void print_result_row(std::ostream &out, const qmck::result_row &row, const qmck::generic_table_format &format);

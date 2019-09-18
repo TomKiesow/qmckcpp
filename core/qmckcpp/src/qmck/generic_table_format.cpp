@@ -2,7 +2,7 @@
 
 #include <utility>
 
-qmck::generic_table_format::generic_table_format(uint32_t inputs_count, uint32_t outputs_count) : inputs_count(inputs_count), outputs_count(outputs_count)
+qmck::generic_table_format::generic_table_format(uint8_t inputs_count, uint8_t outputs_count) : inputs_count(inputs_count), outputs_count(outputs_count)
 {
 }
 

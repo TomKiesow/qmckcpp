@@ -2,7 +2,7 @@
 
 #include <algorithm>
 
-qmck::tree::tree qmck::tree::utils::build_tree(const result_table &result, int result_col)
+qmck::tree::tree qmck::tree::utils::build_tree(const result_table &result, const int result_col)
 {
     tree tree{};
     auto rootnode = tree.rootnode;
@@ -31,23 +31,20 @@ qmck::tree::tree qmck::tree::utils::build_tree(const result_table &result, int r
         }
     }
 
-    auto &roots_children = rootnode->children;
-    for (std::size_t child_i{0}; child_i < roots_children.size(); ++child_i)
+    auto roots_children = rootnode->children;
+    for (auto child : roots_children)
     {
-        auto child = roots_children[child_i];
-
         if (child->children.empty())
         {
             rootnode->remove_child(child);
             tree.destroy_node(child);
-            --child_i;
         }
     }
 
     return tree;
 }
 
-bool qmck::tree::utils::node_comparator(const qmck::tree::node *a, const qmck::tree::node *b)
+bool qmck::tree::utils::node_comparator(const node *a, const node *b)
 {
     if (a->is_leaf() && b->is_leaf())
     {
@@ -65,9 +62,10 @@ bool qmck::tree::utils::node_comparator(const qmck::tree::node *a, const qmck::t
     {
         return a < b;
     }
+    return false; // should be unreachable
 }
 
-int qmck::tree::utils::calc_depth(node *node)
+int qmck::tree::utils::calc_depth(const node *node)
 {
     if (node->children.empty())
     {
@@ -103,7 +101,7 @@ void qmck::tree::utils::remove_unneeded_braces_recursion(tree &tree, node *curre
 
     // if current has only one child
     // remove child and connect its children to self
-    if (children.size() == 1)
+    while (children.size() == 1)
     {
         auto &child = children[0];
         for (auto childs_child : child->children)
@@ -116,11 +114,15 @@ void qmck::tree::utils::remove_unneeded_braces_recursion(tree &tree, node *curre
 
         tree.destroy_node(child);
     }
-    else
+
+    bool children_changed = true;
+    while (children_changed)
     {
-        for (std::size_t child_i{0}; child_i < children.size(); ++child_i)
+        children_changed = false;
+
+        for (auto child : children)
         {
-            auto child = children[child_i];
+            remove_unneeded_braces_recursion(tree, child);
             if (child->operation == current->operation && !child->is_leaf())
             {
                 for (auto childs_child : child->children)
@@ -131,12 +133,10 @@ void qmck::tree::utils::remove_unneeded_braces_recursion(tree &tree, node *curre
                 children.insert(children.end(), child->children.begin(), child->children.end());
 
                 tree.destroy_node(child);
-                --child_i; // compensate for removed child
-            }
-            else
-            {
-                // in an else because we dont wanna check destroyed child!
-                remove_unneeded_braces_recursion(tree, child);
+                // break loop and start over from the beginning
+                // because newly added children would be ignored otherwise
+                children_changed = true;
+                break;
             }
         }
     }
@@ -157,7 +157,7 @@ void qmck::tree::utils::simplify_idempotency(tree &tree)
                 for (std::size_t child_i2{child_i1 + 1}; child_i2 < children.size(); ++child_i2)
                 {
                     auto child2 = children[child_i2];
-                    // if nodes share operand we ca remove one of them
+                    // if nodes share operand we can remove one of them
                     if (child2->is_leaf() && child1->operand == child2->operand && child1->negated == child2->negated)
                     {
                         current_node->remove_child(child2);
@@ -172,7 +172,9 @@ void qmck::tree::utils::simplify_idempotency(tree &tree)
 
 void qmck::tree::utils::simplify_absorption(tree &tree)
 {
-    while(simplify_absorption(tree, tree.rootnode)){}
+    while (simplify_absorption(tree, tree.rootnode))
+    {
+    }
 }
 
 bool qmck::tree::utils::simplify_absorption(tree &tree, node *node)
@@ -217,9 +219,13 @@ bool qmck::tree::utils::simplify_absorption(tree &tree, node *node)
         }
         if (child_depth > 1)
         {
-            while(simplify_absorption(tree, child)){}
+            while (simplify_absorption(tree, child))
+            {
+            }
         }
     }
+
+    return false;
 }
 
 qmck::tree::node *qmck::tree::utils::duplicate_subtree(tree &tree, node *orig)
@@ -247,15 +253,10 @@ qmck::tree::node *qmck::tree::utils::multiply_nodes(tree &tree, node *parent_of_
         node *leaf = node1->is_leaf() ? node1 : node2;
         node *subtree = node1->is_leaf() ? node2 : node1;
 
-        for (std::size_t child_i{0}; child_i < subtree->children.size(); ++child_i)
+        for (auto child : subtree->children)
         {
-            auto child = subtree->children[child_i];
-
             auto new_node = tree.create_node(result, 0, result->operation);
             result->children.push_back(new_node);
-
-            subtree->remove_child(child);
-            --child_i; // compensate for removed child
 
             child->parent = new_node;
             new_node->children.push_back(child);
@@ -263,6 +264,7 @@ qmck::tree::node *qmck::tree::utils::multiply_nodes(tree &tree, node *parent_of_
             auto leaf_copy = tree.create_node(new_node, leaf->operand, leaf->operation); // operation actually irrelevant
             new_node->children.push_back(leaf_copy);
         }
+
         parent_of_both->remove_child(leaf);
         parent_of_both->remove_child(subtree);
 
@@ -309,4 +311,42 @@ qmck::tree::node *qmck::tree::utils::multiply_nodes(tree &tree, node *parent_of_
     }
 
     return result;
+}
+
+bool qmck::tree::utils::has_petrick_result_form(const tree &tree)
+{
+    auto &children = tree.rootnode->children;
+
+    for (auto child : children)
+    {
+        if (!child->is_leaf())
+        {
+            if (child->operation == OPERATION_OR)
+            {
+                return false;
+            }
+        }
+    }
+
+    return calc_depth(tree.rootnode) <= 2;
+}
+
+std::vector<qmck::logic_value> qmck::tree::utils::get_all_operands(const node* node)
+{
+    std::vector<qmck::logic_value> result{};
+
+    get_all_operands_recursion(node, result);
+
+    std::sort(result.begin(), result.end());
+    result.erase(std::unique(result.begin(), result.end()), result.end());
+    return result;
+}
+
+void qmck::tree::utils::get_all_operands_recursion(const node* current, std::vector<qmck::logic_value> &values){
+    if(current->is_leaf()){
+        values.push_back(current->operand);
+    }
+    for(auto child : current->children){
+        get_all_operands_recursion(child, values);
+    }
 }
