@@ -28,4 +28,6 @@ namespace qmck
     };
 
     logic_table parse_logic_table(char const *table_c_str_begin, char const *table_c_str_end);
+
+    void swap(logic_table &first, logic_table &second);
 }

@@ -25,4 +25,6 @@ namespace qmck
 
         friend void swap(generic_table_format &first, generic_table_format &second);
     };
+
+    void swap(generic_table_format &first, generic_table_format &second);
 }
