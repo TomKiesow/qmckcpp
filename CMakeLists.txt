@@ -10,4 +10,5 @@ set(CMAKE_CXX_FLAGS_RELEASE "-O2")
 project(QMCKCPP CXX)
 
 add_subdirectory(core/qmckcpp)
+add_subdirectory(tools/easyloggingpp)
 add_subdirectory(tools/qmckcpp-cmd)

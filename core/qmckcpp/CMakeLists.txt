@@ -1,4 +1,4 @@
-add_library(qmckcpp
+add_library(qmckcpp SHARED
         # headers
         include/qmck.hpp
         include/qmck_io.hpp

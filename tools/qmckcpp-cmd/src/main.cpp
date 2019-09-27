@@ -1,5 +1,6 @@
 #include <qmck.hpp>
 #include <qmck/tree/tree_utils.hpp>
+#include <easylogging++.h>
 
 #include <fstream>
 #include <iostream>
@@ -7,6 +8,8 @@
 #include <algorithm>
 
 using namespace qmck;
+
+INITIALIZE_EASYLOGGINGPP
 
 int main(int const argc, char const **argv)
 {
