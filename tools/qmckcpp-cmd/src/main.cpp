@@ -1,6 +1,6 @@
 #include <qmck.hpp>
 #include <qmck/tree/tree_utils.hpp>
-#include <easylogging++.h>
+#include <loguru.hpp>
 
 #include <fstream>
 #include <iostream>
@@ -9,16 +9,38 @@
 
 using namespace qmck;
 
-INITIALIZE_EASYLOGGINGPP
-
-int main(int const argc, char const **argv)
+int main(int argc, char **argv)
 {
+    loguru::g_preamble_thread = false;
+    loguru::g_preamble_uptime = false;
+
+#ifdef DEBUG
+    #define LOGURU_LOG_ARGS_AND_DIR 1
+    loguru::g_preamble_file = true;
+    loguru::g_preamble_verbose = true;
+    loguru::g_stderr_verbosity = 9; // everything
+#else
+    loguru::g_preamble_verbose = false;
+    loguru::g_preamble_file = false;
+    loguru::g_stderr_verbosity = 0; // only info, will get overwritten by -v n
+#endif
+
+    loguru::init(argc, argv);
+
     if (argc < 2)
     {
+        LOG_F(ERROR, "no input file specified");
         return -1;
     }
 
     std::ifstream table_file_stream(argv[1]);
+
+    if (table_file_stream.fail())
+    {
+        LOG_F(ERROR, "%s: could not open/find file", argv[1]);
+        return -1;
+    }
+
     std::string table_str{std::istreambuf_iterator<char>(table_file_stream), std::istreambuf_iterator<char>()};
 
     char const *begin = table_str.c_str();

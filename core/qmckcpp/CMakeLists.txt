@@ -35,3 +35,4 @@ add_library(qmckcpp SHARED
         )
 
 target_include_directories(qmckcpp PUBLIC include)
+target_link_libraries(qmckcpp PRIVATE loguru)
