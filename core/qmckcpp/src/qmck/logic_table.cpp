@@ -177,7 +177,11 @@ namespace
         }
         else
         {
-            QMCK_LOG_F(ERROR, "reached end of input file: row malformed: row unfinished, discarding row");
+            if (inputs_todo_count < format.inputs_count)
+            {
+                // in this case we have already read a {0,1,x} of a new row
+                QMCK_LOG_F(ERROR, "reached end of input file: row malformed: row unfinished, discarding row");
+            }
         }
 
         rows.clear();
