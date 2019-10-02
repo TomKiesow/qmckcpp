@@ -60,7 +60,7 @@ bool qmck::tree::utils::node_comparator(const node *a, const node *b)
     }
     if (!a->is_leaf() && !b->is_leaf())
     {
-        return a < b;
+        return a->children.size() < b->children.size();
     }
     return false; // should be unreachable
 }
@@ -172,27 +172,30 @@ void qmck::tree::utils::simplify_idempotency(tree &tree)
 
 void qmck::tree::utils::simplify_absorption(tree &tree)
 {
-    while (simplify_absorption(tree, tree.rootnode))
-    {
-    }
+    simplify_absorption(tree, tree.rootnode);
 }
 
 bool qmck::tree::utils::simplify_absorption(tree &tree, node *node)
 {
-    for (auto child : node->children)
+    auto children_todo = node->children;
+    std::sort(children_todo.begin(), children_todo.end(), node_comparator);
+
+    while(!children_todo.empty())
     {
+        auto child = children_todo[0];
+
         std::sort(child->children.begin(), child->children.end(), node_comparator);
 
-        auto siblings = child->parent->children;
-        siblings.erase(std::remove(siblings.begin(), siblings.end(), child), siblings.end());
-
         auto child_depth = calc_depth(child);
-        for (auto sibling : siblings)
+        if (child_depth <= 1) // child could absorb something...
         {
-            if (child->parent->operation != sibling->operation && child_depth <= 1)
+            auto siblings = children_todo;
+            siblings.erase(std::remove(siblings.begin(), siblings.end(), child), siblings.end());
+
+            for (auto sibling : siblings)
             {
                 bool absorb = false;
-                if (child_depth == 0) // same as is_leaf
+                if (child->is_leaf())
                 {
                     for (auto siblings_child : sibling->children)
                     {
@@ -203,26 +206,25 @@ bool qmck::tree::utils::simplify_absorption(tree &tree, node *node)
                         }
                     }
                 }
-                // child_depth == 1
                 else
                 {
                     std::sort(sibling->children.begin(), sibling->children.end(), node_comparator);
                     absorb = std::includes(sibling->children.begin(), sibling->children.end(), child->children.begin(), child->children.end(), node_comparator);
                 }
+
                 if (absorb)
                 {
-                    child->parent->remove_child(sibling);
+                    node->remove_child(sibling);
+                    children_todo.erase(std::remove(children_todo.begin(), children_todo.end(), sibling), children_todo.end());
                     tree.destroy_node(sibling);
-                    return true;
                 }
             }
         }
         if (child_depth > 1)
         {
-            while (simplify_absorption(tree, child))
-            {
-            }
+            simplify_absorption(tree, child);
         }
+        children_todo.erase(std::remove(children_todo.begin(), children_todo.end(), child), children_todo.end());
     }
 
     return false;
@@ -331,7 +333,7 @@ bool qmck::tree::utils::has_petrick_result_form(const tree &tree)
     return calc_depth(tree.rootnode) <= 2;
 }
 
-std::vector<qmck::logic_value> qmck::tree::utils::get_all_operands(const node* node)
+std::vector<qmck::logic_value> qmck::tree::utils::get_all_operands(const node *node)
 {
     std::vector<qmck::logic_value> result{};
 
