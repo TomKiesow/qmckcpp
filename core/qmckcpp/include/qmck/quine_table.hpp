@@ -33,5 +33,7 @@ namespace qmck
 
         quine_table &operator=(quine_table const &lhs) = default;
 
+        std::size_t calculate_comparison_count_max();
+
     };
 }

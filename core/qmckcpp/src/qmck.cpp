@@ -13,12 +13,19 @@ namespace qmck
 
         quine_table all_prime_rows{quine_table_current.format};
 
+        int quine_table_counter = 2; // number 1 is the original
+
         auto ranks_size = quine_table_current.ranks.size();
         while (!quine_table_current.empty())
         {
+            QMCK_VLOG_SCOPE_F(1, "table of order %d", quine_table_counter);
+            int comparison_max = quine_table_current.calculate_comparison_count_max();
+            int comparison_current = 0;
+
             for (std::size_t i{0}; i < ranks_size; ++i)
             {
-                auto &next_bundle = quine_table_next.ranks[i];
+                auto &result_bundle = quine_table_next.ranks[i];
+
                 auto &lower_bundle = quine_table_current.ranks[i];
                 auto &upper_bundle = quine_table_current.ranks[i + 1];
 
@@ -30,6 +37,16 @@ namespace qmck
                     auto upper_n = upper_bundle.size();
                     for (std::size_t upper_i{0}; upper_i < upper_n; ++upper_i)
                     {
+                        // is there a better way to achieve similar?
+                        int verbosity = 7;
+                        verbosity -= (comparison_current % 10) == 0;
+                        verbosity -= (comparison_current % 100) == 0;
+                        verbosity -= (comparison_current % 1000) == 0;
+                        verbosity -= (comparison_current % 10000) == 0;
+                        verbosity -= (comparison_current % 100000) == 0;
+                        verbosity -= (comparison_current % 1000000) == 0;
+                        QMCK_VLOG_IF_F(verbosity, comparison_current != 0, "comparison %d of %d (%.2f%%)", comparison_current, comparison_max, (double) comparison_current / comparison_max * 100);
+
                         auto &upper_row = upper_bundle[upper_i];
 
                         if (lower_row.inputs_deduced_mask == upper_row.inputs_deduced_mask && __builtin_popcount(lower_row.inputs ^ upper_row.inputs) == 1 && lower_row.outputs & upper_row.outputs)
@@ -42,11 +59,12 @@ namespace qmck
                             next_row.outputs = lower_row.outputs & upper_row.outputs;
                             next_row.outputs_done_mask = next_row.outputs_dc_mask;
 
-                            next_bundle.push_back(next_row);
+                            result_bundle.push_back(next_row);
 
                             lower_row.outputs_done_mask |= next_row.outputs;
                             upper_row.outputs_done_mask |= next_row.outputs;
                         }
+                        ++comparison_current;
                     }
                 }
             }
@@ -68,6 +86,8 @@ namespace qmck
             }
             quine_table_current = quine_table_next;
             quine_table_next = quine_table(quine_table_current.format);
+
+            ++quine_table_counter;
         }
 
 

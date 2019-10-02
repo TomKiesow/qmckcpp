@@ -32,3 +32,16 @@ bool qmck::quine_table::empty() const
     }
     return true;
 }
+
+std::size_t qmck::quine_table::calculate_comparison_count_max()
+{
+    std::size_t count = 0;
+    for (std::size_t i{0}; i < ranks.size() - 1; ++i)
+    {
+        auto& rank1 = ranks[i];
+        auto& rank2 = ranks[i + 1];
+
+        count += rank1.size() * rank2.size();
+    }
+    return count;
+}
