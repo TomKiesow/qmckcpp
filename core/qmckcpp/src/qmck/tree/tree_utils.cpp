@@ -1,6 +1,8 @@
 #include <qmck/tree/tree_utils.hpp>
+#include <qmck_io.hpp>
 
 #include <algorithm>
+#include <iostream>
 
 qmck::tree::tree qmck::tree::utils::build_tree(const result_table &result, const int result_col)
 {
@@ -44,6 +46,33 @@ qmck::tree::tree qmck::tree::utils::build_tree(const result_table &result, const
     return tree;
 }
 
+// true if v2 is subset of v1
+bool qmck::tree::utils::is_sorted_subvector(const std::vector<node *> &v1, const std::vector<node *> &v2, bool (*equals_function)(const node *, const node *))
+{
+    std::size_t i1{0};
+    std::size_t i2{0};
+
+    if (v2.empty())
+    {
+        return true;
+    }
+
+    while (i1 < v1.size() && i2 < v2.size())
+    {
+        if (equals_function(v1[i1], v2[i2]))
+        {
+            ++i2;
+        }
+        else
+        {
+            ++i1;
+        }
+    }
+
+    return i2 == v2.size();
+}
+
+// only use this for sorting, equal nodes might not be equal according to this function
 bool qmck::tree::utils::node_comparator(const node *a, const node *b)
 {
     if (a->is_leaf() && b->is_leaf())
@@ -62,7 +91,7 @@ bool qmck::tree::utils::node_comparator(const node *a, const node *b)
     {
         return a->children.size() < b->children.size();
     }
-    return false; // should be unreachable
+    return false;
 }
 
 int qmck::tree::utils::calc_depth(const node *node)
@@ -144,25 +173,44 @@ void qmck::tree::utils::remove_unneeded_braces_recursion(tree &tree, node *curre
 
 void qmck::tree::utils::simplify_idempotency(tree &tree)
 {
-    auto &all_nodes = tree.all_nodes;
-    for (std::size_t all_nodes_i{0}; all_nodes_i < all_nodes.size(); ++all_nodes_i)
+    simplify_idempotency_recursion(tree, tree.rootnode);
+}
+
+void qmck::tree::utils::simplify_idempotency_recursion(tree &tree, node *current)
+{
+    auto &children = current->children;
+    std::sort(children.begin(), children.end(), node_comparator);
+
+    for (auto child : children)
     {
-        auto current_node = all_nodes[all_nodes_i].get();
-        auto &children = current_node->children;
-        for (std::size_t child_i1{0}; child_i1 < children.size(); ++child_i1)
+        simplify_idempotency_recursion(tree, child);
+    }
+
+    for (std::size_t child_i{0}; child_i < children.size(); ++child_i)
+    {
+        auto child = children[child_i];
+        for (std::size_t sibling_i{child_i + 1}; sibling_i < children.size(); ++sibling_i)
         {
-            auto child1 = children[child_i1];
-            if (child1->is_leaf())
+            auto sibling = children[sibling_i];
+            if (child->children.size() == sibling->children.size())
             {
-                for (std::size_t child_i2{child_i1 + 1}; child_i2 < children.size(); ++child_i2)
+                if (child->is_leaf())
                 {
-                    auto child2 = children[child_i2];
                     // if nodes share operand we can remove one of them
-                    if (child2->is_leaf() && child1->operand == child2->operand && child1->negated == child2->negated)
+                    if (sibling->is_leaf() && child->operand == sibling->operand && child->negated == sibling->negated)
                     {
-                        current_node->remove_child(child2);
-                        --child_i2; // compensate for removed child
-                        tree.destroy_node(child2);
+                        children.erase(children.begin() + sibling_i);
+                        --sibling_i;
+                        tree.destroy_node(sibling);
+                    }
+                }
+                else
+                {
+                    if (is_sorted_subvector(child->children, sibling->children, node::equals))
+                    {
+                        children.erase(children.begin() + sibling_i);
+                        --sibling_i;
+                        tree.destroy_subtree(sibling);
                     }
                 }
             }
@@ -172,13 +220,14 @@ void qmck::tree::utils::simplify_idempotency(tree &tree)
 
 void qmck::tree::utils::simplify_absorption(tree &tree)
 {
+    // TODO: absorbtion is whats holding us back. change this to pass newly created nodes explicitly so that we dont check each node 1000 times!
     simplify_absorption(tree, tree.rootnode);
 }
 
 bool qmck::tree::utils::simplify_absorption(tree &tree, node *node)
 {
+    std::sort(node->children.begin(), node->children.end(), node_comparator);
     auto children_todo = node->children;
-    std::sort(children_todo.begin(), children_todo.end(), node_comparator);
 
     while(!children_todo.empty())
     {
@@ -189,11 +238,10 @@ bool qmck::tree::utils::simplify_absorption(tree &tree, node *node)
         auto child_depth = calc_depth(child);
         if (child_depth <= 1) // child could absorb something...
         {
-            auto siblings = children_todo;
-            siblings.erase(std::remove(siblings.begin(), siblings.end(), child), siblings.end());
-
-            for (auto sibling : siblings)
+            for (std::size_t sibling_i{1}; sibling_i < children_todo.size(); ++sibling_i)
             {
+                auto sibling = children_todo[sibling_i];
+
                 bool absorb = false;
                 if (child->is_leaf())
                 {
@@ -209,14 +257,15 @@ bool qmck::tree::utils::simplify_absorption(tree &tree, node *node)
                 else
                 {
                     std::sort(sibling->children.begin(), sibling->children.end(), node_comparator);
-                    absorb = std::includes(sibling->children.begin(), sibling->children.end(), child->children.begin(), child->children.end(), node_comparator);
+                    absorb = is_sorted_subvector(sibling->children, child->children, node::equals);
                 }
 
                 if (absorb)
                 {
                     node->remove_child(sibling);
                     children_todo.erase(std::remove(children_todo.begin(), children_todo.end(), sibling), children_todo.end());
-                    tree.destroy_node(sibling);
+                    tree.destroy_subtree(sibling);
+                    --sibling_i;
                 }
             }
         }
@@ -224,7 +273,7 @@ bool qmck::tree::utils::simplify_absorption(tree &tree, node *node)
         {
             simplify_absorption(tree, child);
         }
-        children_todo.erase(std::remove(children_todo.begin(), children_todo.end(), child), children_todo.end());
+        children_todo.erase(children_todo.begin());
     }
 
     return false;

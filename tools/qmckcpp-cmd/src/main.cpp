@@ -70,7 +70,7 @@ int main(int argc, char **argv)
         while (!tree::utils::has_petrick_result_form(tree) && children.size() >= 2)
         {
             child_count_current = tree.rootnode->children.size();
-            LOG_F(INFO, "progress: %0.2f%%", 100 - (float) child_count_current / child_count_initial * 100);
+            VLOG_F(1, "progress: %0.2f%%", 100 - (float) child_count_current / child_count_initial * 100);
 
             auto child1 = children[0];
             auto child2 = children[1];

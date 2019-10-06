@@ -8,6 +8,10 @@ namespace qmck::tree::utils
 {
     qmck::tree::tree build_tree(const qmck::result_table &table, int result_col);
 
+    // true if v2 is subset of v1
+    bool is_sorted_subvector(const std::vector<node *> &v1, const std::vector<node *> &v2, bool (*equals_function)(const node *, const node *));
+
+    // only use this for sorting, equal nodes might not be equal according to this function
     bool node_comparator(const node* a, const node* b);
 
     int calc_depth(const node *node);
@@ -18,6 +22,8 @@ namespace qmck::tree::utils
     void remove_unneeded_braces_recursion(tree &tree, node *current);
 
     void simplify_idempotency(tree &tree);
+
+    void simplify_idempotency_recursion(tree &tree, node *current);
 
     void simplify_absorption(tree &tree);
 

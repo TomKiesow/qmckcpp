@@ -30,5 +30,7 @@ namespace qmck::tree
         void remove_child(const node *);
 
         bool is_leaf() const;
+
+        static bool equals(const node *n1, const node *n2);
     };
 }
