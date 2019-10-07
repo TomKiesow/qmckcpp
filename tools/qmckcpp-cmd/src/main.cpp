@@ -1,6 +1,5 @@
 #include <qmck.hpp>
 #include <qmck/tree/tree_utils.hpp>
-#include <loguru.hpp>
 
 #include <fstream>
 #include <iostream>
@@ -11,25 +10,10 @@ using namespace qmck;
 
 int main(int argc, char **argv)
 {
-    loguru::g_preamble_thread = false;
-    loguru::g_preamble_uptime = false;
-    loguru::g_internal_verbosity = 1; // so message block will no be printed by default
-
-#ifdef DEBUG
-    loguru::g_preamble_file = true;
-    loguru::g_preamble_verbose = true;
-    loguru::g_stderr_verbosity = 9; // everything
-#else
-    loguru::g_preamble_verbose = false;
-    loguru::g_preamble_file = false;
-    loguru::g_stderr_verbosity = 0; // only info, will get overwritten by -v n
-#endif
-
-    loguru::init(argc, argv);
 
     if (argc < 2)
     {
-        LOG_F(ERROR, "no input file specified");
+        std::cout << "no input file specified\n";
         return -1;
     }
 
@@ -37,7 +21,7 @@ int main(int argc, char **argv)
 
     if (table_file_stream.fail())
     {
-        LOG_F(ERROR, "%s: could not open/find file", argv[1]);
+        std::cout << argv[1] << ": could not open/find file\n";
         return -1;
     }
 
@@ -54,12 +38,12 @@ int main(int argc, char **argv)
 
     for (logic_value output_index{0}; output_index < result.format.outputs_count; ++output_index)
     {
+        std::cout << "building tree for solution " << output_index << "\n";
         auto tree = tree::utils::build_tree(result, output_index);
 
-        LOG_F(INFO, "calculating solutions for output no %d..", output_index);
         int child_count_initial = tree.rootnode->children.size();
         int child_count_current = tree.rootnode->children.size();
-        LOG_F(INFO, "progress: %0.2f%%", 100 - (float) child_count_current / child_count_initial * 100);
+        std::cout << "calculating solutions for output no " << output_index << ": " << (int) (100 - (float) child_count_current / child_count_initial * 100) << "%";
 
         tree::utils::remove_unneeded_braces(tree);
         tree::utils::simplify_absorption(tree);
@@ -70,7 +54,7 @@ int main(int argc, char **argv)
         while (!tree::utils::has_petrick_result_form(tree) && children.size() >= 2)
         {
             child_count_current = tree.rootnode->children.size();
-            VLOG_F(1, "progress: %0.2f%%", 100 - (float) child_count_current / child_count_initial * 100);
+            std::cout << "\rcalculating solutions for output no " << output_index << ": " << (int) (100 - (float) child_count_current / child_count_initial * 100) << "%";
 
             auto child1 = children[0];
             auto child2 = children[1];
@@ -95,6 +79,8 @@ int main(int argc, char **argv)
             tree::utils::simplify_absorption(tree);
             tree::utils::remove_unneeded_braces(tree);
         }
+
+        std::cout << "\rcalculating solutions for output no " << output_index << ": 100%\n";
 
         // only one solution
         if (tree.rootnode->operation == tree::OPERATION_AND)

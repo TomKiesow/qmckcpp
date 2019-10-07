@@ -1,3 +1,0 @@
-[submodule "tools/loguru"]
-	path = tools/loguru
-	url = https://github.com/tfki/loguru

@@ -4,10 +4,9 @@
 #include <qmck/logic_row.hpp>
 #include <qmck/logic_value.hpp>
 
-#include <qmck/qmck_logging.hpp>
-
 #include <regex>
 #include <string>
+#include <iostream>
 
 namespace
 {
@@ -58,7 +57,7 @@ namespace
         }
         else
         {
-            QMCK_LOG_F(ERROR, "line %d of input file: expected 'inputs=n'", line_counter);
+            std::cout << "line " << line_counter << " of input file: expected 'inputs=n'\n";
             return table_c_str_end;
         }
 
@@ -77,7 +76,7 @@ namespace
         }
         else
         {
-            QMCK_LOG_F(ERROR, "line %d of input file: expected 'outputs=n'", line_counter);
+            std::cout << "line " << line_counter << " of input file: expected 'outputs=n'\n";
             return table_c_str_end;
         }
 
@@ -99,7 +98,7 @@ namespace
                 case symbol::HIGH:
                 case symbol::LOW:
                 case symbol::DONT_CARE:
-                    QMCK_LOG_F(ERROR, "line %d of input file:  row malformed: expected '%c', found '%c'. discarding surrounding row", line_counter, symbol::DELIMINATOR, *it);
+                    std::cout << "line " << line_counter << " of input file: row malformed: expected '" << symbol::DELIMINATOR << "', found '" << *it << "'. discarding surrounding row\n";
                     rows.clear();
                     return advance_until(it, symbol::DELIMINATOR, line_counter);
                 }
@@ -158,11 +157,11 @@ namespace
             {
                 if (inputs_todo_count == 0)
                 {
-                    QMCK_LOG_F(ERROR, "line %d of input file: row malformed: unknown character '%c', expected '%c', discarding surrounding row", line_counter, *it, symbol::DELIMINATOR);
+                    std::cout << "line " << line_counter << " of input file: row malformed: expected '" << symbol::DELIMINATOR << "', found '" << *it << "'. discarding surrounding row\n";
                 }
                 else
                 {
-                    QMCK_LOG_F(ERROR, "line %d of input file: row malformed: unknown character '%c', discarding surrounding row", line_counter, *it);
+                    std::cout << "line " << line_counter << " of input file: row malformed: found '" << *it << "'. discarding surrounding row\n";
                 }
 
                 rows.clear();
@@ -173,14 +172,14 @@ namespace
 
         if (inputs_todo_count == 0)
         {
-            QMCK_LOG_F(ERROR, "reached end of input file: row malformed: expected '%c', discarding row", symbol::DELIMINATOR);
+            std::cout << "reached end of input file: row malformed: expected '" << symbol::DELIMINATOR << "', discarding row\n";
         }
         else
         {
             if (inputs_todo_count < format.inputs_count)
             {
                 // in this case we have already read a {0,1,x} of a new row
-                QMCK_LOG_F(ERROR, "reached end of input file: row malformed: row unfinished, discarding row");
+                std::cout << "reached end of input file: row malformed: row unfinished, discarding row\n";
             }
         }
 
@@ -202,7 +201,7 @@ namespace
                 case symbol::HIGH:
                 case symbol::LOW:
                 case symbol::DONT_CARE:
-                    QMCK_LOG_F(ERROR, "line %d of input file: row malformed: expected '%c', found '%c'. discarding surrounding row", line_counter, symbol::ROW_DELIMINATOR, *it);
+                    std::cout << "line " << line_counter << " of input file: row malformed: expected '" << symbol::ROW_DELIMINATOR << "', found '" << *it << "'. discarding surrounding row\n";
                     rows.clear();
                     return advance_until(it, symbol::ROW_DELIMINATOR, line_counter);
                 }
@@ -266,11 +265,11 @@ namespace
             {
                 if (outputs_todo_count == 0)
                 {
-                    QMCK_LOG_F(ERROR, "line %d of input file: row malformed: unknown character '%c', expected '%c', discarding surrounding row", line_counter, *it, symbol::ROW_DELIMINATOR);
+                    std::cout << "line " << line_counter << " of input file: row malformed: expected '" << symbol::ROW_DELIMINATOR << "', found '" << *it << "'. discarding surrounding row\n";
                 }
                 else
                 {
-                    QMCK_LOG_F(ERROR, "line %d of input file: row malformed: unknown character '%c', discarding surrounding row", line_counter, *it);
+                    std::cout << "line " << line_counter << " of input file: row malformed: found '" << *it << "'. discarding surrounding row\n";
                 }
 
                 rows.clear();
@@ -281,11 +280,11 @@ namespace
 
         if (outputs_todo_count == 0)
         {
-            QMCK_LOG_F(ERROR, "reached end of input file: row malformed: expected '%c', discarding row", symbol::ROW_DELIMINATOR);
+            std::cout << "reached end of input file: row malformed: expected '" << symbol::ROW_DELIMINATOR << "', discarding row\n";
         }
         else
         {
-            QMCK_LOG_F(ERROR, "reached end of input file: row malformed: row unfinished, discarding row");
+            std::cout << "reached end of input file: row malformed: row unfinished, discarding row\n";
         }
 
         rows.clear();

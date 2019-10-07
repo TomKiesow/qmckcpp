@@ -1,11 +1,13 @@
 #include <qmck.hpp>
 
 #include <list>
+#include <iostream>
 
 namespace qmck
 {
     qmck::result_table deduce(const logic_table &table)
     {
+        // TODO: make output of libqmck optional
         quine_table quine_table_orig{table};
 
         auto &quine_table_current = quine_table_orig;
@@ -18,9 +20,8 @@ namespace qmck
         auto ranks_size = quine_table_current.ranks.size();
         while (!quine_table_current.empty())
         {
-            QMCK_VLOG_SCOPE_F(1, "table of order %d", quine_table_counter);
-            int comparison_max = quine_table_current.calculate_comparison_count_max();
-            int comparison_current = 0;
+            std::size_t comparison_max = quine_table_current.calculate_comparison_count_max();
+            std::size_t comparison_current = 0;
 
             for (std::size_t i{0}; i < ranks_size; ++i)
             {
@@ -37,15 +38,11 @@ namespace qmck
                     auto upper_n = upper_bundle.size();
                     for (std::size_t upper_i{0}; upper_i < upper_n; ++upper_i)
                     {
-                        // is there a better way to achieve similar?
-                        int verbosity = 7;
-                        verbosity -= (comparison_current % 10) == 0;
-                        verbosity -= (comparison_current % 100) == 0;
-                        verbosity -= (comparison_current % 1000) == 0;
-                        verbosity -= (comparison_current % 10000) == 0;
-                        verbosity -= (comparison_current % 100000) == 0;
-                        verbosity -= (comparison_current % 1000000) == 0;
-                        QMCK_VLOG_IF_F(verbosity, comparison_current != 0, "comparison %d of %d (%.2f%%)", comparison_current, comparison_max, (double) comparison_current / comparison_max * 100);
+                        if (comparison_current % 10000000 == 0)
+                        {
+                            std::cout << "\rtable of order " << quine_table_counter << ": " << (int) ((double) comparison_current / comparison_max * 100) << "%";
+                        }
+                        ++comparison_current;
 
                         auto &upper_row = upper_bundle[upper_i];
 
@@ -64,58 +61,47 @@ namespace qmck
                             lower_row.outputs_done_mask |= next_row.outputs;
                             upper_row.outputs_done_mask |= next_row.outputs;
                         }
-                        ++comparison_current;
                     }
                 }
             }
 
             // go through each row in quine_table_current
             // and add it to all_prime_rows in case it is not completely covered
+            // and there is no other equal row in there already
             for (std::size_t rank_i{0}; rank_i < ranks_size; ++rank_i)
             {
                 auto &rank = quine_table_current.ranks[rank_i];
 
                 for (std::size_t j{0}; j < rank.size(); ++j)
                 {
-                    if ((rank[j].outputs & rank[j].outputs_done_mask) != rank[j].outputs)
+                    auto &new_row = rank[j];
+                    if ((new_row.outputs & new_row.outputs_done_mask) != new_row.outputs)
                     {
-                        auto &target_bundle = all_prime_rows.ranks[rank_i];
-                        target_bundle.push_back(rank[j]);
+                        // check if an equal row is already in results table
+                        bool is_duplicate = false;
+                        auto &target_rank = all_prime_rows.ranks[rank_i];
+
+                        for (std::size_t i{0}; i < target_rank.size(); ++i)
+                        {
+                            auto &old_row = target_rank[i];
+                            if (new_row.inputs_deduced_mask == old_row.inputs_deduced_mask && (new_row.inputs & ~new_row.inputs_deduced_mask) == (old_row.inputs & ~old_row.inputs_deduced_mask))
+                            {
+                                is_duplicate = true;
+                                break;
+                            }
+                        }
+                        if (!is_duplicate)
+                        {
+                            target_rank.push_back(new_row);
+                        }
                     }
                 }
             }
             quine_table_current = quine_table_next;
             quine_table_next = quine_table(quine_table_current.format);
 
+            std::cout << "\rtable of order " << quine_table_counter << ": 100%\n";
             ++quine_table_counter;
-        }
-
-
-        // go through all_prime_rows and remove duplicates
-        for (std::size_t rank_i{0}; rank_i < ranks_size; ++rank_i)
-        {
-            auto &rank = all_prime_rows.ranks[rank_i];
-
-            for (std::size_t row_i_upper{0}; row_i_upper < rank.size(); ++row_i_upper)
-            {
-                auto &upper_inputs = rank[row_i_upper].inputs;
-                auto &upper_inputs_deduced_masks = rank[row_i_upper].inputs_deduced_mask;
-
-                for (std::size_t row_i_lower{0}; row_i_lower < rank.size(); ++row_i_lower)
-                {
-                    if (row_i_lower != row_i_upper)
-                    {
-                        auto &lower_inputs = rank[row_i_lower].inputs;
-                        auto &lower_inputs_deduced_masks = rank[row_i_lower].inputs_deduced_mask;
-
-                        if (upper_inputs_deduced_masks == lower_inputs_deduced_masks && (upper_inputs & ~upper_inputs_deduced_masks) == (lower_inputs & ~lower_inputs_deduced_masks))
-                        {
-                            rank.erase(rank.begin() + row_i_lower);
-                            row_i_lower--; // compensate for deleted row, otherwise the row after the deleted one would be skipped
-                        }
-                    }
-                }
-            }
         }
 
         return result_table(all_prime_rows);

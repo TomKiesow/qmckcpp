@@ -1,5 +1,3 @@
-option(QMCK_LOGGING_ENABLED OFF)
-
 add_library(qmckcpp SHARED
         # headers
         include/qmck.hpp
@@ -34,11 +32,6 @@ add_library(qmckcpp SHARED
         src/qmck/tree/node.cpp
         src/qmck/tree/tree.cpp
         src/qmck/tree/tree_utils.cpp
-        include/qmck/qmck_logging.hpp)
+        )
 
 target_include_directories(qmckcpp PUBLIC include)
-
-if (QMCK_LOGGING_ENABLED)
-    target_compile_definitions(qmckcpp PRIVATE -DQMCK_LOGGING_ENABLED=true)
-    target_link_libraries(qmckcpp PRIVATE loguru)
-endif (QMCK_LOGGING_ENABLED)

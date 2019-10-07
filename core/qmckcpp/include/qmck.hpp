@@ -7,7 +7,6 @@
 #include <qmck/logic_table.hpp>
 #include <qmck/generic_table_format.hpp>
 #include <qmck/result_table.hpp>
-#include <qmck/qmck_logging.hpp>
 #include <qmck_io.hpp>
 
 namespace qmck
