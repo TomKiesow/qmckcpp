@@ -9,6 +9,7 @@ set(CMAKE_CXX_FLAGS_RELEASE "-O2 -Wall")
 
 project(QMCKCPP CXX)
 
+set(QMCK_ENABLE_OUTPUT_PROGRESS ON)
 add_subdirectory(core/qmckcpp)
 add_subdirectory(tools/qmckcpp-cmd)
 add_subdirectory(tools/qmckcpp-samplegen)

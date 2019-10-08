@@ -1,4 +1,5 @@
 #include <qmck.hpp>
+#include <qmck_optional_output.hpp>
 
 #include <list>
 #include <iostream>
@@ -7,7 +8,6 @@ namespace qmck
 {
     qmck::result_table deduce(const logic_table &table)
     {
-        // TODO: make output of libqmck optional
         quine_table quine_table_orig{table};
 
         auto &quine_table_current = quine_table_orig;
@@ -15,13 +15,13 @@ namespace qmck
 
         quine_table all_prime_rows{quine_table_current.format};
 
-        int quine_table_counter = 2; // number 1 is the original
+        QMCK_OUTPUT_PROGRESS(int quine_table_counter = 2;) // number 1 is the original
 
         auto ranks_size = quine_table_current.ranks.size();
         while (!quine_table_current.empty())
         {
-            std::size_t comparison_max = quine_table_current.calculate_comparison_count_max();
-            std::size_t comparison_current = 0;
+            QMCK_OUTPUT_PROGRESS(std::size_t comparison_max = quine_table_current.calculate_comparison_count_max();)
+            QMCK_OUTPUT_PROGRESS(std::size_t comparison_current = 0;)
 
             for (std::size_t i{0}; i < ranks_size; ++i)
             {
@@ -38,11 +38,11 @@ namespace qmck
                     auto upper_n = upper_bundle.size();
                     for (std::size_t upper_i{0}; upper_i < upper_n; ++upper_i)
                     {
-                        if (comparison_current % 10000000 == 0)
+                        QMCK_OUTPUT_PROGRESS(if (comparison_current % 10000000 == 0)
                         {
                             std::cout << "\rtable of order " << quine_table_counter << ": " << (int) ((double) comparison_current / comparison_max * 100) << "%";
-                        }
-                        ++comparison_current;
+                        })
+                        QMCK_OUTPUT_PROGRESS(++comparison_current;)
 
                         auto &upper_row = upper_bundle[upper_i];
 
@@ -100,8 +100,8 @@ namespace qmck
             quine_table_current = quine_table_next;
             quine_table_next = quine_table(quine_table_current.format);
 
-            std::cout << "\rtable of order " << quine_table_counter << ": 100%\n";
-            ++quine_table_counter;
+            QMCK_OUTPUT_PROGRESS(std::cout << "\rtable of order " << quine_table_counter << ": 100%\n";)
+            QMCK_OUTPUT_PROGRESS(++quine_table_counter;)
         }
 
         return result_table(all_prime_rows);

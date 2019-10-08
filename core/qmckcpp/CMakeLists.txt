@@ -1,3 +1,5 @@
+option(QMCK_ENABLE_OUTPUT_PROGRESS OFF)
+
 add_library(qmckcpp SHARED
         # headers
         include/qmck.hpp
@@ -32,6 +34,10 @@ add_library(qmckcpp SHARED
         src/qmck/tree/node.cpp
         src/qmck/tree/tree.cpp
         src/qmck/tree/tree_utils.cpp
-        )
+        include/qmck_optional_output.hpp)
 
 target_include_directories(qmckcpp PUBLIC include)
+
+if(QMCK_ENABLE_OUTPUT_PROGRESS)
+    target_compile_definitions(qmckcpp PRIVATE -DQMCK_ENABLE_OUTPUT_PROGRESS=true)
+endif(QMCK_ENABLE_OUTPUT_PROGRESS)
