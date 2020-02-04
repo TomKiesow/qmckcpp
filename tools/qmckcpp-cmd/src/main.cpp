@@ -1,5 +1,4 @@
 #include <qmck.hpp>
-#include <qmck/tree/tree_utils.hpp>
 
 #include <fstream>
 #include <iostream>
@@ -33,98 +32,6 @@ int main(int argc, char **argv)
     auto table = parse_logic_table(begin, end);
 
     auto result = deduce(table);
-
-    std::vector<qmck::logic_value> operands{};
-
-    for (logic_value output_index{0}; output_index < result.format.outputs_count; ++output_index)
-    {
-        std::cout << "building tree for solution " << output_index << "\n";
-        auto tree = tree::utils::build_tree(result, output_index);
-
-        int child_count_initial = tree.rootnode->children.size();
-        int child_count_current = tree.rootnode->children.size();
-        std::cout << "calculating solutions for output no " << output_index << ": " << (int) (100 - (float) child_count_current / child_count_initial * 100) << "%";
-
-        tree::utils::remove_unneeded_braces(tree);
-        tree::utils::simplify_absorption(tree);
-        tree::utils::simplify_idempotency(tree);
-        tree::utils::remove_unneeded_braces(tree);
-
-        auto &children = tree.rootnode->children;
-        while (!tree::utils::has_petrick_result_form(tree) && children.size() >= 2)
-        {
-            child_count_current = tree.rootnode->children.size();
-            std::cout << "\rcalculating solutions for output no " << output_index << ": " << (int) (100 - (float) child_count_current / child_count_initial * 100) << "%";
-
-            auto child1 = children[0];
-            auto child2 = children[1];
-            // make sure child1 or child2 is not a leaf
-            // otherwise multiplication would not change anything
-            if (child1->is_leaf() && child2->is_leaf())
-            {
-                for (std::size_t child_i{2}; child_i < children.size(); ++child_i)
-                {
-                    if (!children[child_i]->is_leaf())
-                    {
-                        child2 = children[child_i];
-                        break;
-                    }
-                }
-            }
-
-            tree::utils::multiply_nodes(tree, tree.rootnode, child1, child2);
-            tree::utils::remove_unneeded_braces(tree);
-            tree::utils::simplify_idempotency(tree);
-            tree::utils::remove_unneeded_braces(tree);
-            tree::utils::simplify_absorption(tree);
-            tree::utils::remove_unneeded_braces(tree);
-        }
-
-        std::cout << "\rcalculating solutions for output no " << output_index << ": 100%\n";
-
-        // only one solution
-        if (tree.rootnode->operation == tree::OPERATION_AND)
-        {
-            auto solution = tree.rootnode;
-            auto outputs_operands = tree::utils::get_all_operands(solution);
-            operands.insert(operands.end(), outputs_operands.begin(), outputs_operands.end());
-
-            int cost{0};
-            for (auto outputs_operand : outputs_operands)
-            {
-                cost += result.rows[outputs_operand].cost;
-            }
-
-            std::cout << solution << " (cost: " << cost << ")\n\n";
-        }
-        // multiple solutions
-        else
-        {
-            for (auto solution : children)
-            {
-                auto outputs_operands = tree::utils::get_all_operands(solution);
-                operands.insert(operands.end(), outputs_operands.begin(), outputs_operands.end());
-
-                int cost{0};
-                for (auto outputs_operand : outputs_operands)
-                {
-                    cost += result.rows[outputs_operand].cost;
-                }
-
-                std::cout << solution << " (cost: " << cost << ")\n";
-            }
-            std::cout << '\n';
-        }
-    }
-
-    std::sort(operands.begin(), operands.end());
-    operands.erase(std::unique(operands.begin(), operands.end()), operands.end());
-    for (auto operand : operands)
-    {
-        std::cout << operand << ": ";
-        print_result_row(std::cout, result.rows[operand], result.format);
-        std::cout << '\n';
-    }
 
     return 0;
 }

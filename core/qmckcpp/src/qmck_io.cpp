@@ -154,67 +154,6 @@ std::ostream &operator<<(std::ostream &out, const qmck::result_table &lhs)
     return out;
 }
 
-std::ostream &operator<<(std::ostream &out, const qmck::tree::tree &tree)
-{
-    return out << tree.rootnode;
-}
-
-std::ostream &operator<<(std::ostream &out, const qmck::tree::node *lhs)
-{
-    if (lhs->is_leaf())
-    {
-        out << +lhs->operand;
-    }
-    else
-    {
-        std::string operation = lhs->operation ? "*" : "+";
-        // loop until -1 and print last child separately so there are no trailing operation signs
-        auto &children = lhs->children;
-        for (std::size_t child_i{0}; child_i + 1 < children.size(); ++child_i)
-        {
-            auto &child = children[child_i];
-            if (child->children.empty())
-            {
-                if (child->negated)
-                {
-                    out << '~';
-                }
-                out << child->operand << operation;
-            }
-            else
-            {
-                if (child->negated)
-                {
-                    out << '~';
-                }
-                out << "(" << child << ")" << operation;
-            }
-        }
-
-        if (!children.empty())
-        {
-            auto &last_child = children[children.size() - 1];
-            if (last_child->children.empty())
-            {
-                if (last_child->negated)
-                {
-                    out << '~';
-                }
-                out << last_child->operand;
-            }
-            else
-            {
-                if (last_child->negated)
-                {
-                    out << '~';
-                }
-                out << "(" << last_child << ")";
-            }
-        }
-    }
-    return out;
-}
-
 void print_result_row(std::ostream &out, const qmck::result_row &row, const qmck::generic_table_format &format)
 {
     char variable{'a'};

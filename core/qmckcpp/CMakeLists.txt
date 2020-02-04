@@ -15,10 +15,6 @@ add_library(qmckcpp SHARED
         include/qmck/result_row.hpp
         include/qmck/result_table.hpp
 
-        include/qmck/tree/node.hpp
-        include/qmck/tree/tree.hpp
-        include/qmck/tree/tree_utils.hpp
-
         # sources
         src/qmck.cpp
         src/qmck_io.cpp
@@ -31,9 +27,6 @@ add_library(qmckcpp SHARED
         src/qmck/result_row.cpp
         src/qmck/result_table.cpp
 
-        src/qmck/tree/node.cpp
-        src/qmck/tree/tree.cpp
-        src/qmck/tree/tree_utils.cpp
         include/qmck_optional_output.hpp)
 
 target_include_directories(qmckcpp PUBLIC include)
