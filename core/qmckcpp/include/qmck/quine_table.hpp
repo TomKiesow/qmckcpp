@@ -12,7 +12,7 @@ namespace qmck
     struct quine_table
     {
     public:
-        generic_table_format format{};
+        generic_table_format format;
         std::array<std::vector<quine_row>, 32> ranks;
 
     public:

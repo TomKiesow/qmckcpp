@@ -14,9 +14,9 @@ int main(int argc, char **argv)
         return -1;
     }
 
-    std::uint32_t inputs{(std::uint32_t) std::stoul(argv[1])};
-    std::uint32_t outputs{(std::uint32_t) std::stoul(argv[2])};
-    std::ofstream file{argv[3]};
+    auto inputs = std::uint32_t(std::stoul(argv[1]));
+    auto outputs = std::uint32_t(std::stoul(argv[2]));
+    auto file = std::ofstream(argv[3]);
 
     file << "inputs = " << inputs << '\n';
     file << "outputs = " << outputs << '\n';

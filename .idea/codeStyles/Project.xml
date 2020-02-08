@@ -27,7 +27,6 @@
       <option name="SUPERCLASS_LIST_BEFORE_COLON" value="0" />
       <option name="ALIGN_INIT_LIST_IN_COLUMNS" value="false" />
       <option name="IN_LINE_SHORT_TERNARY_OPERATOR" value="false" />
-      <option name="FIELDS_PREFIX" value="m_" />
     </Objective-C>
     <Objective-C-extensions>
       <extensions>

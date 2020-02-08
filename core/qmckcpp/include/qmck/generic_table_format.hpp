@@ -7,8 +7,8 @@ namespace qmck
     struct generic_table_format
     {
     public:
-        std::uint8_t inputs_count{};
-        std::uint8_t outputs_count{};
+        std::uint8_t inputs_count;
+        std::uint8_t outputs_count;
 
     public:
         generic_table_format(uint8_t inputs_count, uint8_t outputs_count);

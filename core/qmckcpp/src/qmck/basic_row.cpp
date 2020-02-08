@@ -9,7 +9,7 @@ qmck::basic_row::basic_row(const qmck::basic_row &other)
 
 std::vector<qmck::logic_value> qmck::basic_row::calculate_minterms_covered() const
 {
-    std::vector<qmck::logic_value> result{};
+    std::vector<qmck::logic_value> result;
     result.push_back(inputs & ~inputs_deduced_mask); // value with all deduced bits as 0
 
     for (std::size_t i = 0; i < sizeof(qmck::logic_value) * 8; ++i)

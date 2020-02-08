@@ -6,14 +6,14 @@
 
 namespace qmck
 {
-    qmck::result_table deduce(const logic_table &table)
+    qmck::result_table deduce(const quine_table &table)
     {
-        quine_table quine_table_orig{table};
+        quine_table quine_table_orig = table;
 
         auto &quine_table_current = quine_table_orig;
-        quine_table quine_table_next{quine_table_current.format};
+        quine_table quine_table_next(quine_table_current.format);
 
-        quine_table all_prime_rows{quine_table_current.format};
+        quine_table all_prime_rows(quine_table_current.format);
 
         QMCK_OUTPUT_PROGRESS(int quine_table_counter = 2;) // number 1 is the original
 
@@ -23,7 +23,7 @@ namespace qmck
             QMCK_OUTPUT_PROGRESS(std::size_t comparison_max = quine_table_current.calculate_comparison_count_max();)
             QMCK_OUTPUT_PROGRESS(std::size_t comparison_current = 0;)
 
-            for (std::size_t i{0}; i < ranks_size; ++i)
+            for (std::size_t i = 0; i < ranks_size; ++i)
             {
                 auto &result_bundle = quine_table_next.ranks[i];
 
@@ -31,12 +31,12 @@ namespace qmck
                 auto &upper_bundle = quine_table_current.ranks[i + 1];
 
                 auto lower_n = lower_bundle.size();
-                for (std::size_t lower_i{0}; lower_i < lower_n; ++lower_i)
+                for (std::size_t lower_i = 0; lower_i < lower_n; ++lower_i)
                 {
                     auto &lower_row = lower_bundle[lower_i];
 
                     auto upper_n = upper_bundle.size();
-                    for (std::size_t upper_i{0}; upper_i < upper_n; ++upper_i)
+                    for (std::size_t upper_i = 0; upper_i < upper_n; ++upper_i)
                     {
                         QMCK_OUTPUT_PROGRESS(if (comparison_current % 10000000 == 0)
                         {
@@ -68,11 +68,11 @@ namespace qmck
             // go through each row in quine_table_current
             // and add it to all_prime_rows in case it is not completely covered
             // and there is no other equal row in there already
-            for (std::size_t rank_i{0}; rank_i < ranks_size; ++rank_i)
+            for (std::size_t rank_i = 0; rank_i < ranks_size; ++rank_i)
             {
                 auto &rank = quine_table_current.ranks[rank_i];
 
-                for (std::size_t j{0}; j < rank.size(); ++j)
+                for (std::size_t j = 0; j < rank.size(); ++j)
                 {
                     auto &new_row = rank[j];
                     if ((new_row.outputs & new_row.outputs_done_mask) != new_row.outputs)
@@ -81,7 +81,7 @@ namespace qmck
                         bool is_duplicate = false;
                         auto &target_rank = all_prime_rows.ranks[rank_i];
 
-                        for (std::size_t i{0}; i < target_rank.size(); ++i)
+                        for (std::size_t i = 0; i < target_rank.size(); ++i)
                         {
                             auto &old_row = target_rank[i];
                             if (new_row.inputs_deduced_mask == old_row.inputs_deduced_mask && (new_row.inputs & ~new_row.inputs_deduced_mask) == (old_row.inputs & ~old_row.inputs_deduced_mask))

@@ -10,9 +10,9 @@ namespace qmck
     struct basic_row
     {
     public:
-        logic_value inputs{};
-        logic_value inputs_deduced_mask{};
-        logic_value outputs{};
+        logic_value inputs;
+        logic_value inputs_deduced_mask;
+        logic_value outputs;
 
     public:
         basic_row() = default;

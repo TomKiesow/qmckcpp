@@ -10,8 +10,8 @@ namespace qmck
     struct logic_table
     {
     public:
-        generic_table_format format{};
-        std::vector<logic_row> rows{};
+        generic_table_format format;
+        std::vector<logic_row> rows;
 
     public:
         logic_table() = default;

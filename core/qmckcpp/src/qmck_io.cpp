@@ -12,14 +12,14 @@ std::ostream &operator<<(std::ostream &out, const qmck::quine_table &lhs)
     out << "generic_table_format=" << lhs.format << ",\n\n";
     out << "----------------\n";
 
-    for (std::size_t bundle_i{0}; bundle_i < lhs.ranks.size(); ++bundle_i)
+    for (std::size_t bundle_i = 0; bundle_i < lhs.ranks.size(); ++bundle_i)
     {
         auto const &current_bundle = lhs.ranks[bundle_i];
         if (!current_bundle.empty())
         {
-            for (std::size_t row_i{0}; row_i < current_bundle.size(); ++row_i)
+            for (std::size_t row_i = 0; row_i < current_bundle.size(); ++row_i)
             {
-                for (std::uint32_t j{0}; j < lhs.format.inputs_count; ++j)
+                for (std::uint32_t j = 0; j < lhs.format.inputs_count; ++j)
                 {
                     if ((current_bundle[row_i].inputs_deduced_mask >> (lhs.format.inputs_count - j - 1)) & 1u)
                     {
@@ -32,13 +32,13 @@ std::ostream &operator<<(std::ostream &out, const qmck::quine_table &lhs)
                 }
                 out << " | ";
 
-                for (std::uint32_t k{0}; k < lhs.format.outputs_count; ++k)
+                for (std::uint32_t k = 0; k < lhs.format.outputs_count; ++k)
                 {
                     out << (((current_bundle[row_i].outputs >> (lhs.format.outputs_count - k - 1)) & 1u) ? '1' : '0');
                 }
                 out << "  ";
 
-                for (std::uint32_t l{0}; l < lhs.format.outputs_count; ++l)
+                for (std::uint32_t l = 0; l < lhs.format.outputs_count; ++l)
                 {
                     out << (((current_bundle[row_i].outputs_done_mask >> (lhs.format.outputs_count - l - 1)) & 1u) ? '1' : '0');
                 }
@@ -80,19 +80,19 @@ std::ostream &operator<<(std::ostream &out, const qmck::logic_table &lhs)
 
     for (std::size_t i = 0; i < lhs.rows.size(); ++i)
     {
-        for (std::uint32_t j{0}; j < lhs.format.inputs_count; ++j)
+        for (std::uint32_t j = 0; j < lhs.format.inputs_count; ++j)
         {
             out << (((lhs.rows[i].inputs >> (lhs.format.inputs_count - j - 1)) & 1u) ? '1' : '0');
         }
         out << " | ";
 
-        for (std::uint32_t k{0}; k < lhs.format.outputs_count; ++k)
+        for (std::uint32_t k = 0; k < lhs.format.outputs_count; ++k)
         {
             out << (((lhs.rows[i].outputs >> (lhs.format.outputs_count - k - 1)) & 1u) ? '1' : '0');
         }
         out << "  ";
 
-        for (std::uint32_t l{0}; l < lhs.format.outputs_count; ++l)
+        for (std::uint32_t l = 0; l < lhs.format.outputs_count; ++l)
         {
             out << (((lhs.rows[i].outputs_dc_mask >> (lhs.format.outputs_count - l - 1)) & 1u) ? '1' : '0');
         }
@@ -122,7 +122,7 @@ std::ostream &operator<<(std::ostream &out, const qmck::result_table &lhs)
 
         out << "id:" << id << "  ";
 
-        for (std::uint32_t j{0}; j < lhs.format.inputs_count; ++j)
+        for (std::uint32_t j = 0; j < lhs.format.inputs_count; ++j)
         {
             if ((quine_row.inputs_deduced_mask >> (lhs.format.inputs_count - j - 1)) & 1u)
             {
@@ -135,7 +135,7 @@ std::ostream &operator<<(std::ostream &out, const qmck::result_table &lhs)
         }
         out << " | ";
 
-        for (std::uint32_t k{0}; k < lhs.format.outputs_count; ++k)
+        for (std::uint32_t k = 0; k < lhs.format.outputs_count; ++k)
         {
             out << (((quine_row.outputs >> (lhs.format.outputs_count - k - 1)) & 1u) ? '1' : '0');
         }
@@ -156,8 +156,8 @@ std::ostream &operator<<(std::ostream &out, const qmck::result_table &lhs)
 
 void print_result_row(std::ostream &out, const qmck::result_row &row, const qmck::generic_table_format &format)
 {
-    char variable{'a'};
-    for (std::uint32_t j{0}; j < format.inputs_count; ++j)
+    char variable = 'a';
+    for (std::uint32_t j = 0; j < format.inputs_count; ++j)
     {
         if (!((row.inputs_deduced_mask >> (format.inputs_count - j - 1)) & 1u))
         {

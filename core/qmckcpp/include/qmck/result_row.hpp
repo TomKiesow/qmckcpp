@@ -12,7 +12,7 @@ namespace qmck
     struct result_row : basic_row
     {
     public:
-        int cost{};
+        int cost;
 
     public:
         result_row() = default;

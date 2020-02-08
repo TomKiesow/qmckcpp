@@ -12,7 +12,7 @@ namespace qmck
     struct result_table
     {
     public:
-        generic_table_format format{};
+        generic_table_format format;
         std::map<logic_value, result_row> rows;
 
     public:

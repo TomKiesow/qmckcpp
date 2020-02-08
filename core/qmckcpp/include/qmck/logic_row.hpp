@@ -7,8 +7,8 @@ namespace qmck
     struct logic_row
     {
     public:
-        logic_value inputs{};
-        logic_value outputs_dc_mask{};
-        logic_value outputs{};
+        logic_value inputs;
+        logic_value outputs_dc_mask;
+        logic_value outputs;
     };
 }

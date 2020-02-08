@@ -40,12 +40,12 @@ namespace
     {
         // include all linefeeds from beginning to start of table in the regexes
         // and count them in the matches to keep line_counter accurate
-        static std::regex const inputs_regex{R"(^(\s*)inputs[ \t]*=[ \t]*([[:digit:]]+))"};
-        static std::regex const outputs_regex{R"(^(\s*)outputs[ \t]*=[ \t]*([[:digit:]]+)(\s*))"};
+        static auto const inputs_regex = std::regex(R"(^(\s*)inputs[ \t]*=[ \t]*([[:digit:]]+))");
+        static auto const outputs_regex = std::regex(R"(^(\s*)outputs[ \t]*=[ \t]*([[:digit:]]+)(\s*))");
 
         char const *it = table_c_str_begin;
 
-        std::cmatch match{};
+        std::cmatch match;
         if (std::regex_search(it, match, inputs_regex))
         {
             format.inputs_count = static_cast<uint32_t>(std::stoul(match.str(2)));
@@ -85,7 +85,7 @@ namespace
 
     inline char const *put_inputs(std::vector<qmck::logic_row> &rows, char const *table_c_str_begin, char const *table_c_str_end, qmck::generic_table_format &format, int &line_counter)
     {
-        rows.push_back(qmck::logic_row{});
+        rows.push_back(qmck::logic_row());
 
         auto inputs_todo_count = format.inputs_count;
         char const *it = table_c_str_begin;
@@ -131,12 +131,12 @@ namespace
             {
                 --inputs_todo_count;
                 std::size_t row_count = rows.size();
-                for (std::size_t row_idx{0u}; row_idx < row_count; ++row_idx)
+                for (std::size_t row_idx = 0u; row_idx < row_count; ++row_idx)
                 {
                     rows[row_idx].inputs <<= 1u;
 
-                    qmck::logic_row new_row{};
-                    new_row.inputs = rows[row_idx].inputs | qmck::logic_value{1u};
+                    qmck::logic_row new_row;
+                    new_row.inputs = rows[row_idx].inputs | qmck::logic_value(1u);
                     rows.push_back(new_row);
                 }
 
@@ -213,10 +213,10 @@ namespace
             {
                 --outputs_todo_count;
                 std::size_t row_count = rows.size();
-                for (std::size_t row_idx{0}; row_idx < row_count; ++row_idx)
+                for (std::size_t row_idx = 0; row_idx < row_count; ++row_idx)
                 {
                     rows[row_idx].outputs <<= 1u;
-                    rows[row_idx].outputs |= qmck::logic_value{1u};
+                    rows[row_idx].outputs |= qmck::logic_value(1u);
 
                     rows[row_idx].outputs_dc_mask <<= 1u;
                 }
@@ -227,7 +227,7 @@ namespace
             {
                 --outputs_todo_count;
                 std::size_t row_count = rows.size();
-                for (std::size_t row_idx{0}; row_idx < row_count; ++row_idx)
+                for (std::size_t row_idx = 0; row_idx < row_count; ++row_idx)
                 {
                     rows[row_idx].outputs <<= 1u;
                     rows[row_idx].outputs_dc_mask <<= 1u;
@@ -239,13 +239,13 @@ namespace
             {
                 --outputs_todo_count;
                 std::size_t row_count = rows.size();
-                for (std::size_t row_idx{0}; row_idx < row_count; ++row_idx)
+                for (std::size_t row_idx = 0; row_idx < row_count; ++row_idx)
                 {
                     rows[row_idx].outputs <<= 1u;
-                    rows[row_idx].outputs |= qmck::logic_value{1u};
+                    rows[row_idx].outputs |= qmck::logic_value(1u);
 
                     rows[row_idx].outputs_dc_mask <<= 1u;
-                    rows[row_idx].outputs_dc_mask |= qmck::logic_value{1u};
+                    rows[row_idx].outputs_dc_mask |= qmck::logic_value(1u);
                 }
 
                 break;
@@ -309,7 +309,7 @@ void qmck::swap(logic_table &first, logic_table &second)
 qmck::logic_table qmck::parse_logic_table(char const *i, char const *n)
 {
     int line_counter = 1; // to give useful error information
-    qmck::logic_table table{};
+    qmck::logic_table table;
     i = put_logic_table_format(table.format, i, n, line_counter);
 
     while (i < n)

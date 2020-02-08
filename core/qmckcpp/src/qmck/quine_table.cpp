@@ -8,7 +8,7 @@ qmck::quine_table::quine_table(const logic_table &lhs)
     {
         if (lrow.outputs)
         {
-            quine_row qrow{lrow};
+            auto qrow = quine_row(lrow);
 
             int rank_i = __builtin_popcount(qrow.inputs);
             this->ranks[rank_i].push_back(qrow);
@@ -36,7 +36,7 @@ bool qmck::quine_table::empty() const
 std::size_t qmck::quine_table::calculate_comparison_count_max()
 {
     std::size_t count = 0;
-    for (std::size_t i{0}; i < ranks.size() - 1; ++i)
+    for (std::size_t i = 0; i < ranks.size() - 1; ++i)
     {
         auto& rank1 = ranks[i];
         auto& rank2 = ranks[i + 1];

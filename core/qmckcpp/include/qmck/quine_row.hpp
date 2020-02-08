@@ -11,8 +11,8 @@ namespace qmck
     struct quine_row : basic_row
     {
     public:
-        logic_value outputs_dc_mask{};
-        logic_value outputs_done_mask{};
+        logic_value outputs_dc_mask;
+        logic_value outputs_done_mask;
 
     public:
         quine_row() = default;
