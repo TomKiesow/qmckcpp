@@ -5,6 +5,7 @@
 #include <qmck/logic_value.hpp>
 
 #include <regex>
+#include <algorithm>
 #include <string>
 #include <iostream>
 
@@ -23,7 +24,7 @@ namespace
         LF = '\n'
     };
 
-    char const *advance_until(char const *it, char end, int &line_counter)
+    char const *advance_until(char const *it, char end, size_t &line_counter)
     {
         while (*it != end)
         {
@@ -36,7 +37,7 @@ namespace
         return ++it;
     }
 
-    inline char const *put_logic_table_format(qmck::generic_table_format &format, char const *table_c_str_begin, char const *table_c_str_end, int &line_counter)
+    inline char const *put_logic_table_format(qmck::generic_table_format &format, char const *table_c_str_begin, char const *table_c_str_end, size_t &line_counter)
     {
         // include all linefeeds from beginning to start of table in the regexes
         // and count them in the matches to keep line_counter accurate
@@ -83,7 +84,7 @@ namespace
         return it;
     }
 
-    inline char const *put_inputs(std::vector<qmck::logic_row> &rows, char const *table_c_str_begin, char const *table_c_str_end, qmck::generic_table_format &format, int &line_counter)
+    inline char const *put_inputs(std::vector<qmck::logic_row> &rows, char const *table_c_str_begin, char const *table_c_str_end, qmck::generic_table_format &format, size_t &line_counter)
     {
         rows.push_back(qmck::logic_row());
 
@@ -130,8 +131,8 @@ namespace
             case symbol::DONT_CARE:
             {
                 --inputs_todo_count;
-                std::size_t row_count = rows.size();
-                for (std::size_t row_idx = 0u; row_idx < row_count; ++row_idx)
+                size_t row_count = rows.size();
+                for (size_t row_idx = 0u; row_idx < row_count; ++row_idx)
                 {
                     rows[row_idx].inputs <<= 1u;
 
@@ -188,7 +189,7 @@ namespace
         return it;
     }
 
-    inline char const *put_outputs(std::vector<qmck::logic_row> &rows, char const *table_c_str_begin, char const *table_c_str_end, qmck::generic_table_format &format, int &line_counter)
+    inline char const *put_outputs(std::vector<qmck::logic_row> &rows, char const *table_c_str_begin, char const *table_c_str_end, qmck::generic_table_format &format, size_t &line_counter)
     {
         auto outputs_todo_count = format.outputs_count;
         char const *it = table_c_str_begin;
@@ -212,8 +213,8 @@ namespace
             case symbol::HIGH:
             {
                 --outputs_todo_count;
-                std::size_t row_count = rows.size();
-                for (std::size_t row_idx = 0; row_idx < row_count; ++row_idx)
+                size_t row_count = rows.size();
+                for (size_t row_idx = 0; row_idx < row_count; ++row_idx)
                 {
                     rows[row_idx].outputs <<= 1u;
                     rows[row_idx].outputs |= qmck::logic_value(1u);
@@ -226,8 +227,8 @@ namespace
             case symbol::LOW:
             {
                 --outputs_todo_count;
-                std::size_t row_count = rows.size();
-                for (std::size_t row_idx = 0; row_idx < row_count; ++row_idx)
+                size_t row_count = rows.size();
+                for (size_t row_idx = 0; row_idx < row_count; ++row_idx)
                 {
                     rows[row_idx].outputs <<= 1u;
                     rows[row_idx].outputs_dc_mask <<= 1u;
@@ -238,8 +239,8 @@ namespace
             case symbol::DONT_CARE:
             {
                 --outputs_todo_count;
-                std::size_t row_count = rows.size();
-                for (std::size_t row_idx = 0; row_idx < row_count; ++row_idx)
+                size_t row_count = rows.size();
+                for (size_t row_idx = 0; row_idx < row_count; ++row_idx)
                 {
                     rows[row_idx].outputs <<= 1u;
                     rows[row_idx].outputs |= qmck::logic_value(1u);
@@ -293,22 +294,9 @@ namespace
     }
 }
 
-qmck::logic_table &qmck::logic_table::operator=(logic_table lhs)
-{
-    swap(*this, lhs);
-    return *this;
-}
-
-void qmck::swap(logic_table &first, logic_table &second)
-{
-    using std::swap;
-    swap(first.format, second.format);
-    swap(first.rows, second.rows);
-}
-
 qmck::logic_table qmck::parse_logic_table(char const *i, char const *n)
 {
-    int line_counter = 1; // to give useful error information
+    size_t line_counter = 1; // to give useful error information
     qmck::logic_table table;
     i = put_logic_table_format(table.format, i, n, line_counter);
 

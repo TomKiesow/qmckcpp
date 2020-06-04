@@ -11,5 +11,5 @@
 
 namespace qmck
 {
-    qmck::result_table deduce(const logic_table&);
+    result_table deduce(const logic_table &);
 }

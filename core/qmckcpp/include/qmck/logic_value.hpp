@@ -2,6 +2,7 @@
 
 #include <cstdint>
 
-namespace qmck{
-    typedef std::uint32_t logic_value;
+namespace qmck
+{
+    typedef uint32_t logic_value;
 }
