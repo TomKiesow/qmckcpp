@@ -4,6 +4,8 @@
 #include <fstream>
 #include <cstdint>
 
+#include <string>
+
 void print_usage();
 
 int main(int argc, char **argv)
@@ -14,29 +16,28 @@ int main(int argc, char **argv)
         return -1;
     }
 
-    auto inputs = std::uint32_t(std::stoul(argv[1]));
-    auto outputs = std::uint32_t(std::stoul(argv[2]));
-    auto file = std::ofstream(argv[3]);
+    const uint32_t inputs = std::stoul(argv[1]);
+    const uint32_t outputs = std::stoul(argv[2]);
+    std::ofstream file{argv[3]};
 
     file << "inputs = " << inputs << '\n';
     file << "outputs = " << outputs << '\n';
 
-    std::random_device rd; // obtain a random number from hardware
-    std::mt19937 eng(rd()); // seed the generator
-    std::uniform_int_distribution<> distr(0, 1); // define the range
+    std::random_device rd{};
+    std::mt19937 engine{rd()};
+    std::uniform_int_distribution<uint32_t> distrib{0u, 1u};
 
-    std::uint32_t counter = 0;
-    std::uint32_t limit = 1u << inputs;
-    while (counter++ < limit)
+    uint32_t limit = 1u << inputs;
+    for (uint32_t c = 1u; c <= limit; ++c)
     {
-        for (std::uint32_t i = 0; i < inputs; ++i)
+        for (uint32_t j = 0u; j < inputs; ++j)
         {
-            file << ((counter >> (inputs - i - 1)) & 1u);
+            file << ((c >> (inputs - j - 1u)) & 1u);
         }
         file << '|';
-        for (std::uint32_t i = 0; i < outputs; ++i)
+        for (uint32_t j = 0u; j < outputs; ++j)
         {
-            file << distr(eng);
+            file << distrib(engine);
         }
         file << ";\n";
     }

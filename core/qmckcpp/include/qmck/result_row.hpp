@@ -11,15 +11,45 @@ namespace qmck
 {
     struct result_row : basic_row
     {
-    public:
-        int cost;
+    private:
+
+        uint8_t cost{};
 
     public:
-        result_row() = default;
 
-        explicit result_row(const quine_row &lrow, const generic_table_format &format);
+        constexpr result_row() noexcept = default;
+
+        constexpr result_row(const result_row &) noexcept = default;
+
+        constexpr result_row(result_row &&) noexcept = default;
+
+        explicit result_row(const quine_row &row, const generic_table_format &format) noexcept
+        {
+            outputs = row.outputs;
+            cost = calculate_cost(format);
+        }
+
+    public:
+
+        constexpr result_row &operator=(const result_row &) noexcept = default;
+
+        constexpr result_row &operator=(result_row &&) noexcept = default;
 
     private:
-        int calculate_cost(const generic_table_format &format) const;
+
+        [[nodiscard]] uint8_t calculate_cost(const generic_table_format &format) const
+        {
+            uint8_t c = 0;
+
+            const uint8_t n = format.inputs_count;
+            for (uint8_t i = 0; i < n; ++i)
+            {
+                if (!((inputs_deduced_mask >> (format.inputs_count - i - 1u)) & 1u))
+                {
+                    ++c;
+                }
+            }
+            return c;
+        }
     };
 }

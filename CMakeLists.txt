@@ -1,13 +1,12 @@
 cmake_minimum_required(VERSION 3.13)
-set(CMAKE_CXX_STANDARD 17)
 
-set(CMAKE_C_FLAGS_DEBUG "-O0 -g -Wall -DDEBUG")
-set(CMAKE_CXX_FLAGS_DEBUG "-O0 -g -Wall -DDEBUG")
+set(THIS QMCKCPP)
+project(${THIS} LANGUAGES CXX)
 
-set(CMAKE_C_FLAGS_RELEASE "-O2 -Wall")
-set(CMAKE_CXX_FLAGS_RELEASE "-O2 -Wall")
+set(CMAKE_CXX_STANDARD 20)
+set(CMAKE_CXX_STANDARD_REQUIRED ON)
 
-project(QMCKCPP CXX)
+include(cmake/compiler_options.cmake)
 
 set(QMCK_ENABLE_OUTPUT_PROGRESS ON)
 add_subdirectory(core/qmckcpp)

@@ -1,10 +1,8 @@
-option(QMCK_ENABLE_OUTPUT_PROGRESS OFF)
+cmake_minimum_required(VERSION 3.13)
 
-add_library(qmckcpp SHARED
-        # headers
-        include/qmck.hpp
-        include/qmck_io.hpp
+set(THIS qmckcpp)
 
+set(INCLUDE
         include/qmck/basic_row.hpp
         include/qmck/generic_table_format.hpp
         include/qmck/logic_table.hpp
@@ -14,23 +12,21 @@ add_library(qmckcpp SHARED
         include/qmck/quine_table.hpp
         include/qmck/result_row.hpp
         include/qmck/result_table.hpp
-
-        # sources
-        src/qmck.cpp
-        src/qmck_io.cpp
-
-        src/qmck/basic_row.cpp
-        src/qmck/generic_table_format.cpp
-        src/qmck/logic_table.cpp
-        src/qmck/quine_row.cpp
-        src/qmck/quine_table.cpp
-        src/qmck/result_row.cpp
-        src/qmck/result_table.cpp
-
+        include/qmck.hpp
+        include/qmck_io.hpp
         include/qmck_optional_output.hpp)
 
-target_include_directories(qmckcpp PUBLIC include)
+set(SRC
+        src/qmck/logic_table.cpp
+        src/qmck.cpp
+        src/qmck_io.cpp)
 
-if(QMCK_ENABLE_OUTPUT_PROGRESS)
-    target_compile_definitions(qmckcpp PRIVATE -DQMCK_ENABLE_OUTPUT_PROGRESS=true)
-endif(QMCK_ENABLE_OUTPUT_PROGRESS)
+add_library(${THIS} STATIC ${INCLUDE} ${SRC})
+target_compile_options(${THIS} PUBLIC "$<$<CONFIG:DEBUG>:${QMCK_CXX_FLAGS_DEBUG}>")
+target_compile_options(${THIS} PUBLIC "$<$<CONFIG:RELEASE>:${QMCK_CXX_FLAGS_RELEASE}>")
+target_include_directories(${THIS} PUBLIC include)
+
+option(QMCK_ENABLE_OUTPUT_PROGRESS OFF)
+if (QMCK_ENABLE_OUTPUT_PROGRESS)
+    target_compile_definitions(${THIS} PRIVATE -DQMCK_ENABLE_OUTPUT_PROGRESS=true)
+endif (QMCK_ENABLE_OUTPUT_PROGRESS)
