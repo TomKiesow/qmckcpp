@@ -30,5 +30,6 @@ int main(int argc, char **argv)
     const auto table = parse_logic_table(begin, end);
     const auto result = deduce(table);
 
+    std::cout << result;
     return 0;
 }
